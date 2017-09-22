@@ -1,0 +1,31 @@
+    <?xml version="1.0" encoding="iso-8859-1"?>
+
+<!-- 
+  Please see the license.html file included with this distribution for 
+  attribution and copyright information.
+-->
+
+<root>
+	<template name="list_charinv" merge="replace">
+		<windowlist>
+			<child></child>
+			<child><backcolor>1A40301E</backcolor></child>
+			<datasource>.inventorylist</datasource>
+			<class>char_invitem</class>
+			<allowdelete />
+			<script file="campaign/scripts/char_invlist_adnd.lua" />
+		</windowlist>
+	</template>
+
+	<windowclass name="item_main" merge="join">
+		<sheetdata>
+			<label_column name="effect_label" insertbefore="cost_label">
+				<static textres="item_label_effect" />
+                <tooltip textres="item_label_effect_tooltip" />
+			</label_column>
+			<string_columnh name="effect" insertbefore="cost_label">
+				<gmeditonly />
+			</string_columnh>
+		</sheetdata>
+	</windowclass>
+</root>

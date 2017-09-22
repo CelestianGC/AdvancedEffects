@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<root version="3.0" >
+
+	<properties>
+		<name>Item Enchancements</name>
+		<version>1.0</version>
+		<loadorder>99</loadorder>
+		<description>
+			<text>Item Enchancement, add effects to items and apply when equipped in combat tracker.</text>
+			<website></website>
+			<author>Celestian</author>
+		</description>
+		<ruleset>
+            <name>5E</name>
+		</ruleset>
+	</properties>
+
+	<announcement text="Item Enchancements - Extension, 5E version.\rFor Fantasy Grounds" font="emotefont" />
+
+	<base>		
+        <script name="EffectManagerADND" file="scripts/manager_effect_adnd.lua" />
+
+        <string name="item_label_effect">Effect</string>
+        <string name="item_label_effect_tooltip">Effects that are applied with the item is equipped and the character is in the combat tracker.</string>
+        
+        <includefile source="campaign/record_item_ie.xml" /> 
+    </base>
+    
+</root>
