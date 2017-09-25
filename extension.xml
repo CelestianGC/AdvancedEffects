@@ -4,7 +4,7 @@
 
 	<properties>
 		<name>Item Enchancements</name>
-		<version>1.0</version>
+		<version>1.1</version>
 		<loadorder>99</loadorder>
 		<description>
 			<text>Item Enchancement, add effects to items and apply when equipped in combat tracker.</text>
@@ -21,10 +21,24 @@
 	<base>		
         <script name="EffectManagerADND" file="scripts/manager_effect_adnd.lua" />
 
-        <string name="item_label_effect">Effect</string>
+        <string name="header_effects">Effect Features</string>
+        <string name="item_label_effectfeature">Effect</string>
+        <string name="item_label_effect_visible_tooltip">Always SHOW or HIDE the effect. Default mode shows if item is identified or hides if not.</string>
+        <string name="item_label_effects_hide">Hide</string>
+        <string name="item_label_effects_show">Show</string>
+        
+        <string name="item_label_effects_dice">Dice</string>
+        <string name="item_effects_dice_tooltip">Dice rolled for duration of effect.</string>
+        <string name="item_label_effects_mod_tooltip">Modifier applied to duration or do not use dice and set for static duration.</string>
+        <string name="item_label_effects_unit">Unit</string>
+        <string name="item_label_effects_unit_tooltip">Time unit, round, minute, hour or day.</string>
+        <string name="item_label_effects_string_tooltip">Effect string. i.e. "STR: +1;SAVE -1;"</string>
         <string name="item_label_effect_tooltip">Effects that are applied with the item is equipped and the character is in the combat tracker.</string>
         
+        <string name="item_label_effectfeature">Effect</string>
+            
         <includefile source="campaign/record_item_ie.xml" /> 
+        
     </base>
     
 </root>

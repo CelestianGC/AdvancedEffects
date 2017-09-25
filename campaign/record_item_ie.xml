@@ -16,16 +16,154 @@
 			<script file="campaign/scripts/char_invlist_adnd.lua" />
 		</windowlist>
 	</template>
+	<template name="list_editor_item_effects">
+		<windowlist name="list">
+			<anchored>
+				<top parent="columnanchor" anchor="bottom" relation="relative" offset="0" />
+				<left />
+				<right />
+			</anchored>
+			<allowdelete />
+			<child></child>
+			<child><backcolor>1A40301E</backcolor></child>
+			<noscroll />
+			<script>
+				function onInit()
+					registerMenuItem(Interface.getString("list_menu_createitem"), "insert", 5);
+				end
+				
+				function onMenuSelection(selection)
+					if selection == 5 then
+						self.addEntry(true);
+					end
+				end
+				
+				function onListChanged()
+					update();
+				end
+
+				function update()
+					local bEdit = (window.effects_iedit.getValue() == 1);
+					for _,w in ipairs(getWindows()) do
+						w.idelete.setVisibility(bEdit);
+					end
+				end
+				
+				function addEntry(bFocus)
+					return createWindow();
+				end
+			</script>
+		</windowlist>
+	</template>
 
 	<windowclass name="item_main" merge="join">
 		<sheetdata>
-			<label_column name="effect_label" insertbefore="cost_label">
-				<static textres="item_label_effect" />
-                <tooltip textres="item_label_effect_tooltip" />
-			</label_column>
-			<string_columnh name="effect" insertbefore="cost_label">
-				<gmeditonly />
-			</string_columnh>
-		</sheetdata>
+            <!-- effects -->
+			<header_column name="header_effects" insertbefore="properties_label">
+				<static textres="header_effects" />
+				<center />
+			</header_column>
+			<button_iedit name="effects_iedit">
+				<anchored to="header_effects" position="insidetopright" offset="-5,0" />
+ 				<script>
+					function onValueChanged()
+						local bEditMode = (getValue() == 1);
+						
+						window.effects_list_iadd.setVisible(bEditMode);
+						window.effects_list.update();
+					end
+				</script>
+			</button_iedit>
+			<button_iadd name="effects_list_iadd">
+				<anchored to="effects_iedit" position="lefthigh" offset="5,0" />
+				<target>effects_list</target>
+			</button_iadd>
+
+			<list_editor_item_effects name="effects_list" insertbefore="properties_label">
+				<datasource>.effectlist</datasource>
+				<class>item_effects_entry</class>
+				<script>
+					function addEntry(bFocus)
+						local n = getWindowCount();
+						
+						local w = createWindow();
+						if w then
+							if bFocus then
+								w.durmod.setFocus();
+							end
+						end
+						
+						return w;
+					end
+				</script>
+			</list_editor_item_effects>
+
+        </sheetdata>
 	</windowclass>
+    
+
+    <!-- item effect settings -->
+	<windowclass name="item_effects_entry">
+		<margins control="0,2,0,2" />
+		<sheetdata>
+			<genericcontrol name="rightanchor">
+				<anchored width="0" height="0">
+					<top offset="5" />
+					<right />
+				</anchored>
+				<invisible />
+			</genericcontrol>
+
+			<button_idelete name="idelete">
+				<anchored to="rightanchor">
+					<top />
+					<right anchor="left" relation="relative" offset="-5" />
+				</anchored>
+			</button_idelete>
+            <label>
+                <anchored position="insidetopleft" offset="5,2" width="90" height="20" />
+                <static textres="item_label_effectfeature" />
+            </label>
+            <!-- effect string -->
+            <basicstring name="effect">
+				<anchored position="insidetopleft" offset="97,2" width="120" height="20" />
+                <gmeditonly />
+                <tooltip textres="item_label_effects_string_tooltip" />
+            </basicstring>
+            <!-- dice roll for duration -->
+			<basicdice name="durdice">
+				<anchored to="effect" position="righthigh" offset="10,0" width="60" height="20" />
+				<hideonvalue value="0" />
+                <tooltip textres="item_effects_dice_tooltip" />
+            </basicdice>
+            <!-- static or modifier for duration -->
+			<basicnumber name="durmod">
+				<anchored to="durdice" position="righthigh" offset="10,0" width="30" height="20" />
+				<hideonvalue value="0" />
+                <tooltip textres="item_label_effects_mod_tooltip" />
+			</basicnumber>
+            <!-- unit type for duration -->
+			<button_stringcycler name="durunit">
+				<anchored to="durmod" position="righthigh" offset="10,0" width="40" height="20" />
+				<parameters>
+					<defaultlabelres>effect_label_durunitrnd</defaultlabelres>
+					<labelsres>effect_label_durunitmin|effect_label_durunithr|effect_label_durunitday</labelsres>
+					<values>minute|hour|day</values>
+				</parameters>
+                <tooltip textres="item_label_effects_unit_tooltip" />
+			</button_stringcycler>
+            <!-- show/hide effect -->
+			<button_stringcycler name="visibility">
+				<anchored to="durunit" position="righthigh" offset="10,0" width="40" height="20" />
+				<parameters>
+                    <defaultlabelres>dash</defaultlabelres>
+					<labelsres>item_label_effects_hide|item_label_effects_show</labelsres>
+					<values>hide|show</values>
+				</parameters>
+                <tooltip textres="item_label_effect_visible_tooltip" />
+			</button_stringcycler>
+            
+        </sheetdata>
+	</windowclass>
+    
 </root>
