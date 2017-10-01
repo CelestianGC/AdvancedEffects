@@ -16,7 +16,8 @@
 			<script file="campaign/scripts/char_invlist_adnd.lua" />
 		</windowlist>
 	</template>
-	<template name="list_editor_item_effects">
+    
+	<template name="list_editor_advanced_effects">
 		<windowlist name="list">
 			<anchored>
 				<top parent="columnanchor" anchor="bottom" relation="relative" offset="0" />
@@ -56,54 +57,8 @@
 		</windowlist>
 	</template>
 
-	<windowclass name="item_main" merge="join">
-		<sheetdata>
-            <!-- effects -->
-			<header_column name="header_effects" insertbefore="properties_label">
-				<static textres="header_effects" />
-				<center />
-			</header_column>
-			<button_iedit name="effects_iedit">
-				<anchored to="header_effects" position="insidetopright" offset="-5,0" />
- 				<script>
-					function onValueChanged()
-						local bEditMode = (getValue() == 1);
-						
-						window.effects_list_iadd.setVisible(bEditMode);
-						window.effects_list.update();
-					end
-				</script>
-			</button_iedit>
-			<button_iadd name="effects_list_iadd">
-				<anchored to="effects_iedit" position="lefthigh" offset="5,0" />
-				<target>effects_list</target>
-			</button_iadd>
-
-			<list_editor_item_effects name="effects_list" insertbefore="properties_label">
-				<datasource>.effectlist</datasource>
-				<class>item_effects_entry</class>
-				<script>
-					function addEntry(bFocus)
-						local n = getWindowCount();
-						
-						local w = createWindow();
-						if w then
-							if bFocus then
-								w.durmod.setFocus();
-							end
-						end
-						
-						return w;
-					end
-				</script>
-			</list_editor_item_effects>
-
-        </sheetdata>
-	</windowclass>
-    
-
-    <!-- item effect settings -->
-	<windowclass name="item_effects_entry">
+    <!-- advanced effect settings -->
+	<windowclass name="advanced_effects_entry">
 		<margins control="0,2,0,2" />
         <script>
             function onInit()
@@ -128,16 +83,16 @@
 					<right anchor="left" relation="relative" offset="-5" />
 				</anchored>
 			</button_idelete>
-            
+
             <hs name="name"/>
-            
-            <label>
+<!--             <label>
                 <anchored position="insidetopleft" offset="5,2" width="90" height="20" />
                 <static textres="item_label_effectfeature" />
             </label>
-            <!-- effect string -->
+ -->            <!-- effect string -->
             <basicstring name="effect">
-				<anchored position="insidetopleft" offset="97,2" width="120" height="20" />
+				<!-- <anchored position="insidetopleft" offset="97,2" width="120" height="20" /> -->
+                <anchored position="insidetopleft" offset="5,2" width="120" height="20" />
                 <gmeditonly />
                 <tooltip textres="item_label_effects_string_tooltip" />
             </basicstring>
@@ -177,4 +132,95 @@
         </sheetdata>
 	</windowclass>
     
+
+	<windowclass name="item_main" merge="join">
+		<sheetdata>
+            <!-- effects -->
+			<header_column name="header_effects" insertbefore="properties_label">
+				<static textres="header_effects" />
+				<center />
+			</header_column>
+			<button_iedit name="effects_iedit">
+				<anchored to="header_effects" position="insidetopright" offset="-5,0" />
+ 				<script>
+					function onValueChanged()
+						local bEditMode = (getValue() == 1);
+						
+						window.effects_list_iadd.setVisible(bEditMode);
+						window.effects_list.update();
+					end
+				</script>
+			</button_iedit>
+			<button_iadd name="effects_list_iadd">
+				<anchored to="effects_iedit" position="lefthigh" offset="5,0" />
+				<target>effects_list</target>
+			</button_iadd>
+
+			<list_editor_advanced_effects name="effects_list" insertbefore="properties_label">
+				<datasource>.effectlist</datasource>
+				<class>advanced_effects_entry</class>
+				<script>
+					function addEntry(bFocus)
+						local n = getWindowCount();
+						
+						local w = createWindow();
+						if w then
+							if bFocus then
+								w.effect.setFocus();
+							end
+						end
+						
+						return w;
+					end
+				</script>
+			</list_editor_advanced_effects>
+
+        </sheetdata>
+	</windowclass>
+    
+	<windowclass name="npc_combat" merge="join">
+		<sheetdata>
+            <!-- effects -->
+			<header_column name="header_effects" insertbefore="header_traits">
+				<static textres="header_effects" />
+				<center />
+			</header_column>
+			<button_iedit name="effects_iedit">
+				<anchored to="header_effects" position="insidetopright" offset="-5,0" />
+ 				<script>
+					function onValueChanged()
+						local bEditMode = (getValue() == 1);
+						
+						window.effects_list_iadd.setVisible(bEditMode);
+						window.effects_list.update();
+					end
+				</script>
+			</button_iedit>
+			<button_iadd name="effects_list_iadd">
+				<anchored to="effects_iedit" position="lefthigh" offset="5,0" />
+				<target>effects_list</target>
+			</button_iadd>
+            
+			<list_editor_advanced_effects name="effects_list" insertbefore="header_traits">
+				<datasource>.effectlist</datasource>
+				<class>advanced_effects_entry</class>
+				<script>
+					function addEntry(bFocus)
+						local n = getWindowCount();
+						
+						local w = createWindow();
+						if w then
+							if bFocus then
+								w.effect.setFocus();
+							end
+						end
+						
+						return w;
+					end
+				</script>
+			</list_editor_advanced_effects>
+            <line_column  insertbefore="header_traits" />
+            <!-- end effects -->
+		</sheetdata>
+	</windowclass>
 </root>

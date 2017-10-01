@@ -237,7 +237,7 @@ function checkEffectsAfterEdit(itemNode)
     local nodeChar = DB.getChild(itemNode, ".....");
 --Debug.console("char_invlist.lua","checkEffectsAfterEdit","nodeChar",nodeChar);
 --Debug.console("char_invlist.lua","checkEffectsAfterEdit","itemNode",itemNode);
-    local nodeCT = CharManager.getCTNodeByNodeChar(nodeChar);
+    local nodeCT = EffectManagerADND.getCTNodeByNodeChar(nodeChar);
     if nodeCT then
         for _,nodeEffect in pairs(DB.getChildren(nodeCT, "effects")) do
             local sLabel = DB.getValue(nodeEffect, "label", "");

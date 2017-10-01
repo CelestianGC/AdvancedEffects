@@ -16,10 +16,10 @@
 		</ruleset>
 	</properties>
 
-	<announcement text="Item Enchancements - Extension, 5E version.\rFor Fantasy Grounds" font="emotefont" />
-
+    <announcement text="Item Enchancements - Extension, 5E version.\rfor Fantasy Grounds\r--by Celestian 2017.09.30" font="emotefont" />
 	<base>		
         <script name="EffectManagerADND" file="scripts/manager_effect_adnd.lua" />
+        <script name="CombatManager2" file="scripts/manager_combat2.lua" />
 
         <string name="header_effects">Effect Features</string>
         <string name="item_label_effectfeature">Effect</string>
@@ -37,7 +37,7 @@
         
         <string name="item_label_effectfeature">Effect</string>
             
-        <includefile source="campaign/record_item_ie.xml" /> 
+        <includefile source="advanced_effects.xml" /> 
         
     </base>
     

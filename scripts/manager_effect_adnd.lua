@@ -142,3 +142,45 @@ function getCTNodeByNodeChar(nodeChar)
     end
     return nodeCT;
 end
+
+
+-- flip through all npc effects (generally do this in addNPC()
+-- nodeNPC: node of NPC in NPCs record list
+-- nodeEntry: node in combat tracker for NPC
+function updateNPCEffects(nodeNPC,nodeEntry)
+    for _,nodeNPCEffect in pairs(DB.getChildren(nodeNPC, "effectlist")) do
+        updateNPCEffect(nodeNPCEffect,nodeEntry);
+    end -- for item's effects list 
+end
+-- this will be used to manage NPC effectslist objects
+-- nodeNPCEffect: node in effectlist on NPC
+-- nodeEntry: node in combat tracker for NPC
+function updateNPCEffect(nodeNPCEffect,nodeEntry)
+    local sName = DB.getValue(nodeEntry, "name", "");
+    local sLabel = DB.getValue(nodeNPCEffect, "effect", "");
+    local nRollDuration = 0;
+    local dDurationDice = DB.getValue(nodeNPCEffect, "durdice");
+    local nModDice = DB.getValue(nodeNPCEffect, "durmod", 0);
+    if (dDurationDice and dDurationDice ~= "") then
+        nRollDuration = StringManager.evalDice(dDurationDice, nModDice);
+    else
+        nRollDuration = nModDice;
+    end
+    local nDMOnly = 0;
+    local sVisibility = DB.getValue(nodeNPCEffect, "visibility", "");
+    if sVisibility == "show" then
+        nDMOnly = 0;
+    elseif sVisibility == "hide" then
+        nDMOnly = 1;
+    end
+    local rEffect = {};
+    rEffect.nDuration = nRollDuration;
+    --rEffect.sName = sName .. ";" .. sLabel;
+    rEffect.sName = sLabel;
+    rEffect.sUnits = DB.getValue(nodeNPCEffect, "durunit", "day");
+    rEffect.nInit = 0;
+    --rEffect.sSource = nodeEntry.getPath();
+    rEffect.nGMOnly = nDMOnly;
+    rEffect.sApply = "";
+    EffectManager.addEffect("", "", nodeEntry, rEffect, true);
+end
