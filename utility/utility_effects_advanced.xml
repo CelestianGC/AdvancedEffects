@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<!-- 
+  Please see the license.html file included with this distribution for 
+  attribution and copyright information.
+-->
+
+<root>
+    <!-- advanced effect settings -->
+	<windowclass name="advanced_effects_entry">
+		<margins control="0,2,0,2" />
+         <script file="utility/scripts/advanced_effects.lua" />
+		<sheetdata>
+			<genericcontrol name="rightanchor">
+				<anchored width="0" height="0">
+					<top offset="5" />
+					<right />
+				</anchored>
+				<invisible />
+			</genericcontrol>
+			<genericcontrol name="leftanchor">
+				<anchored width="0" height="0">
+					<top offset="5" />
+					<left />
+				</anchored>
+				<invisible />
+			</genericcontrol>
+
+            <!-- editor button -->
+            <button_poweractioneditor name="effectdetail">
+				<editor>advanced_effect_editor</editor>
+				<anchored to="rightanchor">
+					<top />
+					<right anchor="left" relation="relative" offset="-25" />
+				</anchored>
+			</button_poweractioneditor>
+            
+            <!-- delete button if in edit mode -->
+			<button_idelete name="idelete">
+				<anchored to="rightanchor">
+					<top offset="-2" />
+					<right anchor="left" relation="relative" offset="-25" />
+				</anchored>
+			</button_idelete>
+
+            <hs name="name"/>
+            <basicstring name="effect_description">
+				<anchored to="leftanchor">
+					<top />
+					<left anchor="right" relation="relative" offset="5" />
+                    
+				</anchored>
+                <readonly />
+                <tooltip textres="item_label_effects_string_tooltip" />
+            </basicstring>
+            
+        </sheetdata>
+	</windowclass>
+    
+<!-- new effect edit window work -->
+	<windowclass name="advanced_effect_editor">
+		<frame>charsheethelper</frame>
+		<placement>
+			<size width="350" height="280" />
+		</placement>
+		<sizelimits>
+			<minimum width="350" height="250" />
+			<dynamic />
+		</sizelimits>
+		<nodelete />
+		<playercontrol />
+		<minimize>minimized_char</minimize>
+		<tooltip control="name" />
+		<sheetdata>
+			<windowtitlebar_char name="title">
+				<resource>power_title_effect</resource>
+			</windowtitlebar_char>
+			<anchor_title_charsheethelper name="contentanchor" />
+			
+			<genericcontrol name="contentframe">
+				<anchored to="contentanchor">
+					<top anchor="bottom" offset="0" />
+					<left />
+					<right />
+					<bottom parent="" offset="-30" />
+				</anchored>
+			</genericcontrol>
+
+			<subwindow_record name="main">
+				<class>advanced_effect_editor_main</class>
+				<activate />
+				<fastinit />
+			</subwindow_record>
+
+			<scrollbar_record>
+				<target>main</target>
+			</scrollbar_record>
+
+			<resize_charsheethelper />
+			<close_charsheethelper />
+		</sheetdata>
+	</windowclass>
+
+	<windowclass name="advanced_effect_editor_main">
+        <script file="utility/scripts/advanced_effects_editor.lua" />
+		<sheetdata>
+			<anchor_column name="columnanchor" />
+			
+			<label_column name="name_label">
+				<static textres="power_label_name" />
+			</label_column>
+			<stringcontrol name="name">
+				<anchored>
+					<top parent="columnanchor" anchor="bottom" relation="relative" offset="7" />
+					<left offset="97" />
+					<right offset="-5" />
+				</anchored>
+				<multilinespacing>20</multilinespacing>
+				<font>sheettext</font>
+				<readonly />
+			</stringcontrol>
+
+            <!-- effect type cycler here -->
+			<label_column name="type_label">
+				<static textres="power_label_type" />
+			</label_column>
+            <cycler_effecttypes name="type">
+				<anchored>
+					<top parent="columnanchor" anchor="bottom" relation="relative" offset="7" />
+					<left offset="97" />
+					<right offset="-110" />
+				</anchored>
+                <gmeditonly />
+            </cycler_effecttypes>
+            
+            <!-- effect / label -->
+			<header_column name="header_label">
+				<static textres="power_header_effect" />
+				<center />
+			</header_column>
+			<string_column_full name="effect" />
+			
+            
+            <!-- SAVE types -->
+			<cycler_savetypes name="save_type">
+				<anchored>
+					<top parent="columnanchor" anchor="bottom" relation="relative" offset="7" />
+					<left offset="5" />
+					<right offset="-250" />
+				</anchored>
+                <tooltip textres="item_save_type_tooltip" />
+                <gmeditonly />
+			</cycler_savetypes>
+
+			<combobox_saveselect name="save">
+                <anchored to="save_type" position="righthigh" offset="10,0" width="70"  height="20"/>
+                <gmeditonly />
+                <tooltip textres="item_label_save_type_tooltip" />
+			</combobox_saveselect>
+
+            <!-- save modifier/score -->
+ 			<advanced_effect_number name="save_modifier">
+				<anchored to="save" position="righthigh" offset="10,0" width="20"  height="20"/>
+                <tooltip textres="item_label_save_value_tooltip" />
+			</advanced_effect_number>
+
+            <!-- ability version -->
+			<cycler_abilitytypes name="ability_type">
+				<anchored>
+					<top parent="columnanchor" anchor="bottom" relation="relative" offset="7" />
+					<left offset="5" />
+					<right offset="-230" />
+				</anchored>
+                <tooltip textres="item_ability_type_tooltip" />
+                <gmeditonly />
+			</cycler_abilitytypes>
+
+			<cycler_ability_short name="ability">
+                <anchored to="ability_type" position="righthigh" offset="10,0" width="80"  height="20"/>
+			</cycler_ability_short>
+
+            <!-- ability modifier/score -->
+			<advanced_effect_number name="ability_modifier">
+				<anchored to="ability" position="righthigh" offset="10,0" width="20"  height="20"/>
+			</advanced_effect_number>
+            
+            <!-- end ability version -->
+            
+            <!-- Susceptiblity version -->
+			<cycler_susceptiblitytypes name="susceptiblity_type">
+				<anchored>
+					<top parent="columnanchor" anchor="bottom" relation="relative" offset="7" />
+					<left offset="5" />
+					<right offset="-230" />
+				</anchored>
+                <tooltip textres="item_ability_type_tooltip" />
+                <gmeditonly />
+			</cycler_susceptiblitytypes>
+
+            <combobox_susceptiblity_items name="susceptiblity">
+                <anchored to="susceptiblity_type" position="righthigh" offset="10,0" width="80"  height="20"/>
+			</combobox_susceptiblity_items>
+
+            <!-- Susceptiblity modifier/score -->
+			<advanced_effect_number name="susceptiblity_modifier">
+				<anchored to="susceptiblity" position="righthigh" offset="10,0" width="20"  height="20"/>
+			</advanced_effect_number>
+            <!-- end Susceptiblity version -->
+
+            <!-- misc version -->
+			<cycler_misctypes name="misc_type">
+				<anchored>
+					<top parent="columnanchor" anchor="bottom" relation="relative" offset="7" />
+					<left offset="5" />
+					<right offset="-230" />
+				</anchored>
+                <tooltip textres="effect_label_misc_type_tooltip" />
+                <gmeditonly />
+			</cycler_misctypes>
+
+            <!-- misc modifier/score -->
+			<advanced_effect_number name="misc_modifier">
+				<anchored to="misc_type" position="righthigh" offset="10,0" width="20"  height="20"/>
+                <tooltip textres="effect_label_misc_value_tooltip" />
+			</advanced_effect_number>
+            <!-- end misc version -->
+
+            <!-- duration header-->
+			<header_column name="header_duration">
+				<static textres="power_header_effect_duration" />
+				<center />
+			</header_column>
+            
+            <!-- duration dice -->
+			<basicdice name="durdice">
+				<anchored width="50" height="20">
+					<top parent="columnanchor" anchor="bottom" relation="relative" offset="7" />
+					<left offset="5" />
+				</anchored>
+				<hideonvalue value="0" />
+                <tooltip textres="power_label_duration_dice_tooltip" />
+            </basicdice>
+            <!-- duration modifier -->
+			<advanced_effect_number name="durmod">
+				<anchored to="durdice" position="righthigh" offset="10,0" width="20" height="20" />
+                <tooltip textres="power_label_duration_mod_tooltip" />
+			</advanced_effect_number>
+            <!-- duration unit -->
+			<button_stringcycler name="durunit">
+				<anchored to="durmod" position="righthigh" offset="10,0" width="40" height="20" />
+				<parameters>
+					<defaultlabelres>effect_label_durunitrnd</defaultlabelres>
+					<labelsres>effect_label_durunitmin|effect_label_durunithr|effect_label_durunitday</labelsres>
+					<values>minute|hour|day</values>
+				</parameters>
+			</button_stringcycler>
+            <!-- show/hide effect -->
+			<button_stringcycler name="visibility">
+				<anchored to="durunit" position="righthigh" offset="10,0" width="40" height="20" />
+				<parameters>
+                    <defaultlabelres>dash</defaultlabelres>
+					<labelsres>item_label_effects_hide|item_label_effects_show</labelsres>
+					<values>hide|show</values>
+				</parameters>
+                <tooltip textres="item_label_effect_visible_tooltip" />
+			</button_stringcycler>
+		</sheetdata>
+	</windowclass>
+
+<!-- new effect edit window work -->
+    
+</root>

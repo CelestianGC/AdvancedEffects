@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<!-- 
+  Please see the license.html file included with this distribution for 
+  attribution and copyright information.
+-->
+
+<root>
+	<template name="list_editor_advanced_effects">
+		<windowlist name="list">
+			<anchored>
+				<top parent="columnanchor" anchor="bottom" relation="relative" offset="0" />
+				<left />
+				<right />
+			</anchored>
+			<allowdelete />
+			<child></child>
+			<child><backcolor>1A40301E</backcolor></child>
+			<noscroll />
+			<script>
+				function onInit()
+					registerMenuItem(Interface.getString("list_menu_createitem"), "insert", 5);
+				end
+				
+				function onMenuSelection(selection)
+					if selection == 5 then
+						self.addEntry(true);
+					end
+				end
+				
+				function onListChanged()
+					update();
+				end
+
+				function update()
+					local bEdit = (window.effects_iedit.getValue() == 1);
+					for _,w in ipairs(getWindows()) do
+						w.idelete.setVisibility(bEdit);
+					end
+				end
+				
+				function addEntry(bFocus)
+					return createWindow();
+				end
+			</script>
+		</windowlist>
+	</template>
+
+	<template name="cycler_abilitytypes">
+		<button_stringcycler>
+			<parameters>
+                <defaultlabelres mergerule="replace">modifier</defaultlabelres>
+				<labelsres>modifier</labelsres>
+                <values>modifier</values>
+			</parameters>
+		</button_stringcycler>
+	</template>
+	<template name="cycler_ability_short">
+		<button_stringcycler>
+			<parameters>
+				<defaultlabelres mergerule="replace">strength</defaultlabelres>
+				<labelsres>dexterity|constitution|intelligence|wisdom|charisma</labelsres>
+				<values>dex|con|int|wis|cha</values>
+			</parameters>
+		</button_stringcycler>
+	</template>
+
+	<template name="cycler_effecttypes">
+		<button_stringcycler>
+			<parameters>
+				<defaultlabelres mergerule="replace">dash</defaultlabelres>
+				<labelsres>save|ability|susceptiblity|misc</labelsres>
+                <values>save|ability|susceptiblity|misc</values>
+			</parameters>
+		</button_stringcycler>
+	</template>
+	<template name="cycler_savetypes">
+		<button_stringcycler>
+			<parameters>
+                <defaultlabelres mergerule="replace">modifier</defaultlabelres>
+				<labelsres>modifier</labelsres>
+                <values>modifier</values>
+			</parameters>
+		</button_stringcycler>
+	</template>
+	<template name="combobox_saveselect">
+			<combobox>
+				<listdirection>down</listdirection>
+				<script>
+					function onInit()
+						super.onInit();
+						addItems({"STR","DEX","CON","INT","WIS","CHA"});
+					end
+				</script>
+				<!-- <script file="campaign/scripts/prof_select.lua"/> bonuscomps -->
+			</combobox>
+	</template>
+	<template name="cycler_susceptiblitytypes">
+		<button_stringcycler>
+			<parameters>
+				<defaultlabelres mergerule="replace">immune</defaultlabelres>
+				<labelsres>resist|vuln</labelsres>
+                <values>resist|vuln</values>
+			</parameters>
+		</button_stringcycler>
+	</template>
+	<template name="combobox_susceptiblity_items">
+			<combobox>
+				<listdirection>down</listdirection>
+				<script>
+					function onInit()
+						super.onInit();
+						addItems(DataCommon.dmgtypes);
+						addItems(DataCommon.conditions);
+					end
+				</script>
+				<!-- <script file="campaign/scripts/prof_select.lua"/> -->
+			</combobox>
+	</template>
+	<template name="cycler_misctypes">
+		<button_stringcycler>
+			<parameters>
+				<defaultlabelres mergerule="replace">ac</defaultlabelres>
+				<labelsres>atk|check|dmg|heal|init|save</labelsres>
+                <values>atk|check|dmg|heal|init|save</values>
+			</parameters>
+		</button_stringcycler>
+	</template>
+    <template name="advanced_effect_number">
+        <basicnumber>
+            <default>0</default>
+            <hideonvalue>0</hideonvalue>
+            <gmeditonly />
+        </basicnumber>
+    </template>
+
+</root>
