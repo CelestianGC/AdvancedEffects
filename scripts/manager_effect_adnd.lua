@@ -3,6 +3,11 @@
 --
 --
 -- add the effect if the item is equipped and doesn't exist already
+function onInit()
+	CombatManager.setCustomAddPC(addPC);
+    CombatManager.setCustomAddNPC(addNPC);
+end
+
 function updateItemEffects(nodeItem)
 --Debug.console("manager_effect_adnd.lua","updateItemEffects1","nodeItem",nodeItem);
     local nodeChar = DB.getChild(nodeItem, "...");
@@ -143,31 +148,30 @@ function getCTNodeByNodeChar(nodeChar)
     return nodeCT;
 end
 
-
--- flip through all npc effects (generally do this in addNPC()
--- nodeNPC: node of NPC in NPCs record list
--- nodeEntry: node in combat tracker for NPC
-function updateNPCEffects(nodeNPC,nodeEntry)
-    for _,nodeNPCEffect in pairs(DB.getChildren(nodeNPC, "effectlist")) do
-        updateNPCEffect(nodeNPCEffect,nodeEntry);
+-- flip through all npc effects (generally do this in addNPC()/addPC()
+-- nodeChar: node of PC/NPC in PC/NPCs record list
+-- nodeEntry: node in combat tracker for PC/NPC
+function updateCharEffects(nodeChar,nodeEntry)
+    for _,nodeCharEffect in pairs(DB.getChildren(nodeChar, "effectlist")) do
+        updateCharEffect(nodeCharEffect,nodeEntry);
     end -- for item's effects list 
 end
--- this will be used to manage NPC effectslist objects
--- nodeNPCEffect: node in effectlist on NPC
--- nodeEntry: node in combat tracker for NPC
-function updateNPCEffect(nodeNPCEffect,nodeEntry)
+-- this will be used to manage PC/NPC effectslist objects
+-- nodeCharEffect: node in effectlist on PC/NPC
+-- nodeEntry: node in combat tracker for PC/NPC
+function updateCharEffect(nodeCharEffect,nodeEntry)
     local sName = DB.getValue(nodeEntry, "name", "");
-    local sLabel = DB.getValue(nodeNPCEffect, "effect", "");
+    local sLabel = DB.getValue(nodeCharEffect, "effect", "");
     local nRollDuration = 0;
-    local dDurationDice = DB.getValue(nodeNPCEffect, "durdice");
-    local nModDice = DB.getValue(nodeNPCEffect, "durmod", 0);
+    local dDurationDice = DB.getValue(nodeCharEffect, "durdice");
+    local nModDice = DB.getValue(nodeCharEffect, "durmod", 0);
     if (dDurationDice and dDurationDice ~= "") then
         nRollDuration = StringManager.evalDice(dDurationDice, nModDice);
     else
         nRollDuration = nModDice;
     end
     local nDMOnly = 0;
-    local sVisibility = DB.getValue(nodeNPCEffect, "visibility", "");
+    local sVisibility = DB.getValue(nodeCharEffect, "visibility", "");
     if sVisibility == "show" then
         nDMOnly = 0;
     elseif sVisibility == "hide" then
@@ -177,10 +181,166 @@ function updateNPCEffect(nodeNPCEffect,nodeEntry)
     rEffect.nDuration = nRollDuration;
     --rEffect.sName = sName .. ";" .. sLabel;
     rEffect.sName = sLabel;
-    rEffect.sUnits = DB.getValue(nodeNPCEffect, "durunit", "day");
+    rEffect.sLabel = sLabel; 
+    rEffect.sUnits = DB.getValue(nodeCharEffect, "durunit", "day");
     rEffect.nInit = 0;
     --rEffect.sSource = nodeEntry.getPath();
     rEffect.nGMOnly = nDMOnly;
     rEffect.sApply = "";
     EffectManager.addEffect("", "", nodeEntry, rEffect, true);
+end
+
+-- custom version of the one in CoreRPG to deal with adding new 
+-- pcs to the combat tracker to deal with advanced effects. --celestian
+function addPC(nodePC)
+	-- Parameter validation
+	if not nodePC then
+		return;
+	end
+
+	-- Create a new combat tracker window
+	local nodeEntry = DB.createChild("combattracker.list");
+	if not nodeEntry then
+		return;
+	end
+	
+	-- Set up the CT specific information
+	DB.setValue(nodeEntry, "link", "windowreference", "charsheet", nodePC.getNodeName());
+	DB.setValue(nodeEntry, "friendfoe", "string", "friend");
+
+	local sToken = DB.getValue(nodePC, "token", nil);
+	if not sToken or sToken == "" then
+		sToken = "portrait_" .. nodePC.getName() .. "_token"
+	end
+	DB.setValue(nodeEntry, "token", "token", sToken);
+
+    -- check to see if npc effects exists and if so apply --celestian
+    updateCharEffects(nodePC,nodeEntry);
+end
+
+-- copied the base addNPC from manager_combat2.lua from 5E ruleset for this and
+-- added the bit that checks for PC effects to add -- celestian
+function addNPC(sClass, nodeNPC, sName)
+	local nodeEntry, nodeLastMatch = CombatManager.addNPCHelper(nodeNPC, sName);
+	
+	-- Fill in spells
+	CampaignDataManager2.updateNPCSpells(nodeEntry);
+	
+	-- Determine size
+	local sSize = StringManager.trim(DB.getValue(nodeEntry, "size", ""):lower());
+	if sSize == "large" then
+		DB.setValue(nodeEntry, "space", "number", 10);
+	elseif sSize == "huge" then
+		DB.setValue(nodeEntry, "space", "number", 15);
+	elseif sSize == "gargantuan" then
+		DB.setValue(nodeEntry, "space", "number", 20);
+	end
+	
+	-- Set current hit points
+	local sOptHRNH = OptionsManager.getOption("HRNH");
+	local nHP = DB.getValue(nodeNPC, "hp", 0);
+	local sHD = StringManager.trim(DB.getValue(nodeNPC, "hd", ""));
+	if sOptHRNH == "max" and sHD ~= "" then
+		nHP = StringManager.evalDiceString(sHD, true, true);
+	elseif sOptHRNH == "random" and sHD ~= "" then
+		nHP = math.max(StringManager.evalDiceString(sHD, true), 1);
+	end
+	DB.setValue(nodeEntry, "hptotal", "number", nHP);
+	
+	-- Set initiative from Dexterity modifier
+	local nDex = DB.getValue(nodeNPC, "abilities.dexterity.score", 10);
+	local nDexMod = math.floor((nDex - 10) / 2);
+	DB.setValue(nodeEntry, "init", "number", nDexMod);
+	
+	-- Track additional damage types and intrinsic effects
+	local aEffects = {};
+	
+	-- Vulnerabilities
+	local aVulnTypes = CombatManager2.parseResistances(DB.getValue(nodeEntry, "damagevulnerabilities", ""));
+	if #aVulnTypes > 0 then
+		for _,v in ipairs(aVulnTypes) do
+			if v ~= "" then
+				table.insert(aEffects, "VULN: " .. v);
+			end
+		end
+	end
+			
+	-- Damage Resistances
+	local aResistTypes = CombatManager2.parseResistances(DB.getValue(nodeEntry, "damageresistances", ""));
+	if #aResistTypes > 0 then
+		for _,v in ipairs(aResistTypes) do
+			if v ~= "" then
+				table.insert(aEffects, "RESIST: " .. v);
+			end
+		end
+	end
+	
+	-- Damage immunities
+	local aImmuneTypes = CombatManager2.parseResistances(DB.getValue(nodeEntry, "damageimmunities", ""));
+	if #aImmuneTypes > 0 then
+		for _,v in ipairs(aImmuneTypes) do
+			if v ~= "" then
+				table.insert(aEffects, "IMMUNE: " .. v);
+			end
+		end
+	end
+
+	-- Condition immunities
+	local aImmuneCondTypes = {};
+	local sCondImmune = DB.getValue(nodeEntry, "conditionimmunities", ""):lower();
+	for _,v in ipairs(StringManager.split(sCondImmune, ",;\r", true)) do
+		if StringManager.isWord(v, DataCommon.conditions) then
+			table.insert(aImmuneCondTypes, v);
+		end
+	end
+	if #aImmuneCondTypes > 0 then
+		table.insert(aEffects, "IMMUNE: " .. table.concat(aImmuneCondTypes, ", "));
+	end
+	
+	-- Decode traits and actions
+	local rActor = ActorManager.getActor("", nodeNPC);
+	for _,v in pairs(DB.getChildren(nodeEntry, "actions")) do
+		CombatManager2.parseNPCPower(rActor, v, aEffects);
+	end
+	for _,v in pairs(DB.getChildren(nodeEntry, "legendaryactions")) do
+		CombatManager2.parseNPCPower(rActor, v, aEffects);
+	end
+	for _,v in pairs(DB.getChildren(nodeEntry, "lairactions")) do
+		CombatManager2.parseNPCPower(rActor, v, aEffects);
+	end
+	for _,v in pairs(DB.getChildren(nodeEntry, "reactions")) do
+		CombatManager2.parseNPCPower(rActor, v, aEffects);
+	end
+	for _,v in pairs(DB.getChildren(nodeEntry, "traits")) do
+		CombatManager2.parseNPCPower(rActor, v, aEffects);
+	end
+	for _,v in pairs(DB.getChildren(nodeEntry, "innatespells")) do
+		CombatManager2.parseNPCPower(rActor, v, aEffects, true);
+	end
+	for _,v in pairs(DB.getChildren(nodeEntry, "spells")) do
+		CombatManager2.parseNPCPower(rActor, v, aEffects, true);
+	end
+
+	-- Add special effects
+	if #aEffects > 0 then
+		EffectManager.addEffect("", "", nodeEntry, { sName = table.concat(aEffects, "; "), nDuration = 0, nGMOnly = 1 }, false);
+	end
+
+    -- check to see if npc effects exists and if so apply --celestian
+    EffectManagerADND.updateNPCEffects(nodeNPC,nodeEntry);
+
+	-- Roll initiative and sort
+	local sOptINIT = OptionsManager.getOption("INIT");
+	if sOptINIT == "group" then
+		if nodeLastMatch then
+			local nLastInit = DB.getValue(nodeLastMatch, "initresult", 0);
+			DB.setValue(nodeEntry, "initresult", "number", nLastInit);
+		else
+			DB.setValue(nodeEntry, "initresult", "number", math.random(20) + DB.getValue(nodeEntry, "init", 0));
+		end
+	elseif sOptINIT == "on" then
+		DB.setValue(nodeEntry, "initresult", "number", math.random(20) + DB.getValue(nodeEntry, "init", 0));
+	end
+
+	return nodeEntry;
 end

@@ -123,6 +123,7 @@
             <!-- effect type cycler here -->
 			<label_column name="type_label">
 				<static textres="power_label_type" />
+                <tooltip textres="power_label_type_tooltip" />
 			</label_column>
             <cycler_effecttypes name="type">
 				<anchored>
@@ -131,7 +132,9 @@
 					<right offset="-110" />
 				</anchored>
                 <gmeditonly />
+                <tooltip textres="power_label_type_tooltip" />
             </cycler_effecttypes>
+            
             
             <!-- effect / label -->
 			<header_column name="header_label">

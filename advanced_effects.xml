@@ -95,4 +95,57 @@
             <!-- end effects -->
 		</sheetdata>
 	</windowclass>
+    
+	<windowclass name="charsheet_abilities_contents" merge="join" insertafter="languagestitle">
+		<sheetdata>
+            <!-- effects -->
+			<label_charframetop name="advancedeffectstitle">
+				<anchored to="languagestitle" height="20">
+					<top anchor="bottom" relation="relative" offset="7" />
+					<left />
+					<right />
+				</anchored>
+				<static textres="char_abilities_label_advancedeffects" />
+				<icons>char_abilities</icons>
+				<target>header_effects</target>
+			</label_charframetop>
+
+
+			<button_iedit name="effects_iedit">
+				<anchored to="advancedeffectstitle" position="insidetopright" offset="-5,0" />
+ 				<script>
+					function onValueChanged()
+						local bEditMode = (getValue() == 1);
+						
+						window.effects_list_iadd.setVisible(bEditMode);
+						window.effects_list.update();
+					end
+				</script>
+			</button_iedit>
+			<button_iadd name="effects_list_iadd">
+				<anchored to="effects_iedit" position="lefthigh" offset="5,0" />
+				<target>effects_list</target>
+			</button_iadd>
+            
+			<list_editor_advanced_effects name="effects_list">
+                <anchored>
+                    <top parent="advancedeffectstitle" anchor="bottom" relation="relative" offset="0" />
+                    <left />
+                    <right />
+                </anchored>
+				<datasource>.effectlist</datasource>
+				<class>advanced_effects_entry</class>
+				<script>
+					function addEntry(bFocus)
+						local n = getWindowCount();
+						
+						local w = createWindow();
+						return w;
+					end
+				</script>
+			</list_editor_advanced_effects>
+            <!-- end advanced effects entry -->
+		</sheetdata>
+	</windowclass>
+    
 </root>
