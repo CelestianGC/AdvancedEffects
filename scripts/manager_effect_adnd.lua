@@ -214,6 +214,12 @@ function addPC(nodePC)
 	end
 	DB.setValue(nodeEntry, "token", "token", sToken);
 
+    -- now flip through inventory and pass each to updateEffects()
+    -- so that if they have a combat_effect it will be applied.
+    for _,nodeItem in pairs(DB.getChildren(nodePC, "inventorylist")) do
+        updateItemEffects(nodeItem,true);
+    end
+    -- end
     -- check to see if npc effects exists and if so apply --celestian
     updateCharEffects(nodePC,nodeEntry);
 end
@@ -327,7 +333,7 @@ function addNPC(sClass, nodeNPC, sName)
 	end
 
     -- check to see if npc effects exists and if so apply --celestian
-    EffectManagerADND.updateNPCEffects(nodeNPC,nodeEntry);
+    updateCharEffects(nodeNPC,nodeEntry);
 
 	-- Roll initiative and sort
 	local sOptINIT = OptionsManager.getOption("INIT");
