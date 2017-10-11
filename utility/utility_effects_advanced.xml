@@ -6,6 +6,63 @@
 -->
 
 <root>
+    <!-- advanced effects subwindow -->
+    <windowclass name="advanced_effects_subwindow">
+		<margins control="0,0,2,2" />
+        <script>
+            function onInit()
+                if User.isHost() then
+                    header_effects.setVisible(true);
+                    effects_iedit.setVisible(true);
+                    effects_list_iadd.setVisible(true);
+                    effects_list.setVisible(true);
+                else
+                    header_effects.setVisible(false);
+                    effects_iedit.setVisible(false);
+                    effects_list_iadd.setVisible(false);
+                    effects_list.setVisible(false);
+                end
+            end
+        </script>
+		<sheetdata>
+			<anchor_column name="columnanchor" />
+            <!-- effects -->
+			<header_column name="header_effects">
+				<static textres="header_effects" />
+				<center />
+			</header_column>
+			<button_iedit name="effects_iedit">
+				<anchored to="header_effects" position="insidetopright" offset="-5,0" />
+ 				<script>
+					function onValueChanged()
+						local bEditMode = (getValue() == 1);
+						
+						window.effects_list_iadd.setVisible(bEditMode);
+						window.effects_list.update();
+					end
+				</script>
+			</button_iedit>
+			<button_iadd name="effects_list_iadd">
+				<anchored to="effects_iedit" position="lefthigh" offset="5,0" />
+				<target>effects_list</target>
+			</button_iadd>
+            
+			<list_editor_advanced_effects name="effects_list">
+				<datasource>.effectlist</datasource>
+				<class>advanced_effects_entry</class>
+				<script>
+					function addEntry(bFocus)
+						local n = getWindowCount();
+						
+						local w = createWindow();
+						return w;
+					end
+				</script>
+			</list_editor_advanced_effects>
+            <!-- end advanced effects entry -->
+		</sheetdata>
+    </windowclass>
+
     <!-- advanced effect settings -->
 	<windowclass name="advanced_effects_entry">
 		<margins control="0,2,0,2" />
@@ -57,7 +114,7 @@
         </sheetdata>
 	</windowclass>
     
-<!-- new effect edit window work -->
+<!-- advanced effect edit window -->
 	<windowclass name="advanced_effect_editor">
 		<frame>charsheethelper</frame>
 		<placement>
@@ -131,10 +188,8 @@
 					<left offset="97" />
 					<right offset="-110" />
 				</anchored>
-                <gmeditonly />
                 <tooltip textres="power_label_type_tooltip" />
             </cycler_effecttypes>
-            
             
             <!-- effect / label -->
 			<header_column name="header_label">
@@ -152,12 +207,10 @@
 					<right offset="-250" />
 				</anchored>
                 <tooltip textres="item_save_type_tooltip" />
-                <gmeditonly />
 			</cycler_savetypes>
 
 			<combobox_saveselect name="save">
                 <anchored to="save_type" position="righthigh" offset="10,0" width="70"  height="20"/>
-                <gmeditonly />
                 <tooltip textres="item_label_save_type_tooltip" />
 			</combobox_saveselect>
 
@@ -175,7 +228,6 @@
 					<right offset="-230" />
 				</anchored>
                 <tooltip textres="item_ability_type_tooltip" />
-                <gmeditonly />
 			</cycler_abilitytypes>
 
 			<cycler_ability_short name="ability">
@@ -197,7 +249,6 @@
 					<right offset="-230" />
 				</anchored>
                 <tooltip textres="item_ability_type_tooltip" />
-                <gmeditonly />
 			</cycler_susceptiblitytypes>
 
             <combobox_susceptiblity_items name="susceptiblity">
@@ -218,7 +269,6 @@
 					<right offset="-230" />
 				</anchored>
                 <tooltip textres="effect_label_misc_type_tooltip" />
-                <gmeditonly />
 			</cycler_misctypes>
 
             <!-- misc modifier/score -->

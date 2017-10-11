@@ -20,7 +20,43 @@
 	<windowclass name="item_main" merge="join">
         <sheetdata>
             <!-- effects -->
-			<header_column name="header_effects" insertbefore="properties_label">
+			<subwindow name="advanced_effects_contents" insertbefore="properties_label">
+				<anchored>
+					<top parent="columnanchor" anchor="bottom" relation="relative" offset="0" />
+					<left offset="5" />
+                    <right offset="5" />
+				</anchored>
+				<class>advanced_effects_subwindow</class>
+				<activate />
+				<fastinit />
+                <invisible />
+			</subwindow>
+            <!-- end advanced effects entry -->
+        </sheetdata>
+	</windowclass>
+    
+    <!-- advanced effects subwindow -->
+    <windowclass name="advanced_effects_subwindow">
+		<margins control="0,0,2,2" />
+        <script>
+            function onInit()
+                if User.isHost() then
+                    header_effects.setVisible(true);
+                    effects_iedit.setVisible(true);
+                    effects_list_iadd.setVisible(true);
+                    effects_list.setVisible(true);
+                else
+                    header_effects.setVisible(false);
+                    effects_iedit.setVisible(false);
+                    effects_list_iadd.setVisible(false);
+                    effects_list.setVisible(false);
+                end
+            end
+        </script>
+		<sheetdata>
+			<anchor_column name="columnanchor" />
+            <!-- effects -->
+			<header_column name="header_effects">
 				<static textres="header_effects" />
 				<center />
 			</header_column>
@@ -40,7 +76,7 @@
 				<target>effects_list</target>
 			</button_iadd>
             
-			<list_editor_advanced_effects name="effects_list" insertbefore="properties_label">
+			<list_editor_advanced_effects name="effects_list">
 				<datasource>.effectlist</datasource>
 				<class>advanced_effects_entry</class>
 				<script>
@@ -53,45 +89,23 @@
 				</script>
 			</list_editor_advanced_effects>
             <!-- end advanced effects entry -->
-        </sheetdata>
-	</windowclass>
+		</sheetdata>
+    </windowclass>
     
 	<windowclass name="npc_combat" merge="join">
 		<sheetdata>
             <!-- effects -->
-			<header_column name="header_effects" insertbefore="header_traits">
-				<static textres="header_effects" />
-				<center />
-			</header_column>
-			<button_iedit name="effects_iedit">
-				<anchored to="header_effects" position="insidetopright" offset="-5,0" />
- 				<script>
-					function onValueChanged()
-						local bEditMode = (getValue() == 1);
-						
-						window.effects_list_iadd.setVisible(bEditMode);
-						window.effects_list.update();
-					end
-				</script>
-			</button_iedit>
-			<button_iadd name="effects_list_iadd">
-				<anchored to="effects_iedit" position="lefthigh" offset="5,0" />
-				<target>effects_list</target>
-			</button_iadd>
-            
-			<list_editor_advanced_effects name="effects_list" insertbefore="header_traits">
-				<datasource>.effectlist</datasource>
-				<class>advanced_effects_entry</class>
-				<script>
-					function addEntry(bFocus)
-						local n = getWindowCount();
-						
-						local w = createWindow();
-						return w;
-					end
-				</script>
-			</list_editor_advanced_effects>
-            <line_column  insertbefore="header_traits" />
+			<subwindow name="advanced_effects_contents" insertbefore="header_traits">
+				<anchored>
+					<top parent="columnanchor" anchor="bottom" relation="relative" offset="0" />
+					<left offset="5" />
+                    <right offset="5" />
+				</anchored>
+				<class>advanced_effects_subwindow</class>
+				<activate />
+				<fastinit />
+                <invisible />
+			</subwindow>
             <!-- end effects -->
 		</sheetdata>
 	</windowclass>

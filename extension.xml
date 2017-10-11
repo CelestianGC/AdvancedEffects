@@ -4,7 +4,7 @@
 
 	<properties>
 		<name>5E - Advanced Effects</name>
-		<version>1.7</version>
+		<version>1.9</version>
 		<loadorder>99</loadorder>
 		<description>
 			<text>Advanced Effects, add effects to items and npcs.</text>
