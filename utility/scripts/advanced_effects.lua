@@ -17,6 +17,7 @@ function onInit()
     DB.addHandler(DB.getPath(node, ".durmod"),"onUpdate", update);
     DB.addHandler(DB.getPath(node, ".durunit"),"onUpdate", update);
     DB.addHandler(DB.getPath(node, ".visibility"),"onUpdate", update);
+    DB.addHandler(DB.getPath(node, ".actiononly"),"onUpdate", update);
     update();
 end
 function onClose()
@@ -25,9 +26,10 @@ function onClose()
     DB.removeHandler(DB.getPath(node, ".durmod"),"onUpdate", update);
     DB.removeHandler(DB.getPath(node, ".durunit"),"onUpdate", update);
     DB.removeHandler(DB.getPath(node, ".visibility"),"onUpdate", update);
+    DB.removeHandler(DB.getPath(node, ".actiononly"),"onUpdate", update);
 end
 
--- update displace string 
+-- update display string 
 function update()
     local node = getDatabaseNode();
     -- display dice/mods for duration --celestian
@@ -65,6 +67,11 @@ function update()
                 sDuration = sDuration .. "s";
             end
     end
+    local sActionOnly = "[ActionOnly]";
+    local bActionOnly = (DB.getValue(node, "actiononly", 0) ~= 0);
+    if (not bActionOnly) then
+        sActionOnly = "";
+    end
     local sEffect = DB.getValue(node,"effect","");
     local sVis = DB.getValue(node,"visibility","");
     if (sVis ~= "") then
@@ -73,6 +80,7 @@ function update()
     if (sDuration ~= "") then
         sDuration = " for [" .. sDuration .. "]";
     end
-    local sFinal = "[" .. sEffect .. "]" .. sDuration .. sVis;
+    local sFinal = "[" .. sEffect .. "]" .. sDuration .. sVis .. sActionOnly;
     effect_description.setValue(sFinal);
 end
+

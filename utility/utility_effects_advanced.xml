@@ -102,6 +102,13 @@
 
             <hs name="name"/>
             <basicstring name="effect_description">
+                <script>
+                    function onClickDown(button, x, y)
+                        local w = Interface.openWindow("advanced_effect_editor", window.getDatabaseNode());
+                        w.main.subwindow.name.setValue(DB.getValue(window.getDatabaseNode(), "...name", ""));
+                        return true;
+                    end
+                </script>
 				<anchored to="leftanchor">
 					<top />
 					<left anchor="right" relation="relative" offset="5" />
@@ -317,6 +324,14 @@
 				</parameters>
                 <tooltip textres="item_label_effect_visible_tooltip" />
 			</button_stringcycler>
+
+            <!-- weapon/attack effect only? -->
+			<button_checkbox name="actiononly">
+				<anchored to="visibility" position="righthigh" offset="10,0" width="10" height="20" />
+				<tooltip textres="item_label_effect_attackonly" />
+			</button_checkbox>
+            
+            
 		</sheetdata>
 	</windowclass>
 

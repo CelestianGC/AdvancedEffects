@@ -16,6 +16,10 @@
 			<script file="campaign/scripts/char_invlist_adnd.lua" />
 		</windowlist>
 	</template>
+    
+	<windowclass name="char_weapon" merge="join">
+		<script file="campaign/scripts/char_weapon_adnd.lua" merge="replace" />
+    </windowclass>
 
 	<windowclass name="item_main" merge="join">
         <sheetdata>

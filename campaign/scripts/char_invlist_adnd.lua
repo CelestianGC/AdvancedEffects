@@ -32,6 +32,7 @@ function onInit()
 	DB.addHandler(DB.getPath(node, "*.effectlist.*.name"), "onUpdate", updateItemEffectsForEdit);
 	DB.addHandler(DB.getPath(node, "*.effectlist.*.durunit"), "onUpdate", updateItemEffectsForEdit);
 	DB.addHandler(DB.getPath(node, "*.effectlist.*.visibility"), "onUpdate", updateItemEffectsForEdit);
+	DB.addHandler(DB.getPath(node, "*.effectlist.*.actiononly"), "onUpdate", updateItemEffectsForEdit);
 	DB.addHandler(DB.getPath(node), "onChildDeleted", updateFromDeletedInventory);
 end
 
@@ -54,6 +55,7 @@ function onClose()
 	DB.removeHandler(DB.getPath(node, "*.effectlist.*.name"), "onUpdate", updateItemEffectsForEdit);
 	DB.removeHandler(DB.getPath(node, "*.effectlist.*.durunit"), "onUpdate", updateItemEffectsForEdit);
 	DB.removeHandler(DB.getPath(node, "*.effectlist.*.visibility"), "onUpdate", updateItemEffectsForEdit);
+	DB.removeHandler(DB.getPath(node, "*.effectlist.*.actiononly"), "onUpdate", updateItemEffectsForEdit);
 	DB.removeHandler(DB.getPath(node), "onChildDeleted", updateFromDeletedInventory);
 end
 
@@ -228,15 +230,12 @@ function checkEffectsAfterDelete(nodeChar)
             end
             nodeEffect.delete();
         end
-        
     end
 end
 
 -- find the effect for this source and delete and re-build
 function checkEffectsAfterEdit(itemNode)
     local nodeChar = DB.getChild(itemNode, ".....");
---Debug.console("char_invlist.lua","checkEffectsAfterEdit","nodeChar",nodeChar);
---Debug.console("char_invlist.lua","checkEffectsAfterEdit","itemNode",itemNode);
     local nodeCT = EffectManagerADND.getCTNodeByNodeChar(nodeChar);
     if nodeCT then
         for _,nodeEffect in pairs(DB.getChildren(nodeCT, "effects")) do
@@ -244,8 +243,6 @@ function checkEffectsAfterEdit(itemNode)
             local sEffSource = DB.getValue(nodeEffect, "source_name", "");
             -- see if the node exists and if it's in an inventory node
             local nodeFound = DB.findNode(sEffSource);
---Debug.console("char_invlist.lua","checkEffectsAfterEdit","sEffSource",sEffSource);
---Debug.console("char_invlist.lua","checkEffectsAfterEdit","nodeFound",nodeFound);
             if nodeFound and nodeFound == itemNode and string.match(sEffSource,"inventorylist") then
                 nodeEffect.delete();
                 EffectManagerADND.updateItemEffects(DB.getChild(itemNode, "..."));
