@@ -9,11 +9,6 @@ function onInit()
 
     --CoreRPG replacements
     ActionsManager.decodeActors = decodeActors;
-    -- 3.3.3 version is bugged, this fixes it
-    -- (isactive is not set properly)
-    -- this is temporary till it's fixed
-    EffectManager.addEffect = addEffect;    
-    --
     
     -- 5E effects replacements
     EffectManager5E.checkConditionalHelper = checkConditionalHelper;
@@ -107,7 +102,7 @@ function updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquipped, nId
             rEffect.nDuration = nRollDuration;
             rEffect.sName = sName .. ";" .. sLabel;
             rEffect.sLabel = sLabel; 
-            rEffect.sUnits = DB.getValue(nodeItemEffect, "durunit", "day");
+            rEffect.sUnits = DB.getValue(nodeItemEffect, "durunit", "");
             rEffect.nInit = 0;
             rEffect.sSource = sItemSource;
             rEffect.nGMOnly = nDMOnly;
@@ -167,7 +162,7 @@ function updateCharEffect(nodeCharEffect,nodeEntry)
     --rEffect.sName = sName .. ";" .. sLabel;
     rEffect.sName = sLabel;
     rEffect.sLabel = sLabel; 
-    rEffect.sUnits = DB.getValue(nodeCharEffect, "durunit", "day");
+    rEffect.sUnits = DB.getValue(nodeCharEffect, "durunit", "");
     rEffect.nInit = 0;
     --rEffect.sSource = nodeEntry.getPath();
     rEffect.nGMOnly = nDMOnly;
@@ -799,98 +794,6 @@ function checkConditionalHelper(rActor, sEffect, rTarget, aIgnore)
 	
 	return bReturn;
 end
-
--- replace CoreRPG EffectManager manager_effect.lua addEffect() with this
--- Why? it's got a bug in it and not setting isactive correctly, this does.
-function addEffect(sUser, sIdentity, nodeCT, rNewEffect, bShowMsg)
-	if not nodeCT or not rNewEffect or not rNewEffect.sName then
-		return;
-	end
-	local nodeEffectsList = nodeCT.createChild("effects");
-	if not nodeEffectsList then
-		return;
-	end
-	
-	if fCustomOnEffectAddStart then
-		fCustomOnEffectAddStart(rNewEffect);
-	end
-
-    local aEffectVarMap = {
-        ["sName"] = { sDBType = "string", sDBField = "label" },
-        ["nGMOnly"] = { sDBType = "number", sDBField = "isgmonly" },
-        ["sSource"] = { sDBType = "string", sDBField = "source_name", bClearOnUntargetedDrop = true },
-        ["sTarget"] = { sDBType = "string", bClearOnUntargetedDrop = true },
-        ["nDuration"] = { sDBType = "number", sDBField = "duration", vDBDefault = 1, sDisplay = "[D: %d]" },
-        ["nInit"] = { sDBType = "number", sDBField = "init", sSourceChangeSet = "initresult", bClearOnUntargetedDrop = true },
-    };
-	
-	-- Check whether to ignore new effect (i.e. duplicates)
-	local sDuplicateMsg = nil;
-	if fCustomOnEffectAddIgnoreCheck then
-		sDuplicateMsg = fCustomOnEffectAddIgnoreCheck(nodeCT, rNewEffect);
-	else
-		for k, v in pairs(nodeEffectsList.getChildren()) do
-			if (DB.getValue(v, "label", "") == rNewEffect.sName) and 
-					(DB.getValue(v, "init", 0) == rNewEffect.nInit) and
-					(DB.getValue(v, "duration", 0) == rNewEffect.nDuration) then
-				sDuplicateMsg = "Effect ['" .. rNewEffect.sName .. "'] -> [ALREADY EXISTS]"
-				break;
-			end
-		end
-	end
-	if sDuplicateMsg then
-		message(sDuplicateMsg, nodeCT, false, sUser);
-		return;
-	end
-	
-	-- Write effect record
-	local nodeTargetEffect = nodeEffectsList.createChild();
-	for k,v in pairs(aEffectVarMap) do
-		if rNewEffect[k] and v.sDBType and v.sDBField and not v.bSkipAdd then
-			DB.setValue(nodeTargetEffect, v.sDBField, v.sDBType, rNewEffect[k]);
-		end
-	end
-	DB.setValue(nodeTargetEffect, "isactive", "number", 1);
-
-	-- Handle effect targeting
-	if rNewEffect.sTarget and rNewEffect.sTarget ~= "" then
-		addEffectTarget(nodeTargetEffect, rNewEffect.sTarget);
-	end
-	
-	if fCustomOnEffectAddEnd then
-		fCustomOnEffectAddEnd(nodeTargetEffect, rNewEffect);
-	end
-
-	-- Handle effect ownership
-	if sUser ~= "" then
-		DB.setOwner(nodeTargetEffect, sUser);
-	end
-
-	-- Build output message
-	local msg = {font = "msgfont", icon = "roll_effect"};
-	msg.text = "Effect ['" .. rNewEffect.sName .. "'] ";
-	msg.text = msg.text .. "-> [to " .. DB.getValue(nodeCT, "name", "") .. "]";
-	if rNewEffect.sSource and rNewEffect.sSource ~= "" then
-		msg.text = msg.text .. " [by " .. DB.getValue(DB.findNode(rNewEffect.sSource), "name", "") .. "]";
-	end
-	
-	-- Output message
-	if bShowMsg then
-		if isGMEffect(nodeCT, nodeTargetEffect) then
-			if sUser == "" then
-				msg.secret = true;
-				Comm.addChatMessage(msg);
-			elseif sUser ~= "" then
-				Comm.addChatMessage(msg);
-				Comm.deliverChatMessage(msg, sUser);
-			end
-		else
-			Comm.deliverChatMessage(msg);
-		end
-	end
-end
-
-
 
 -- replace 5E ActionDamage manager_action_damage.lua performRoll() with this
 -- extension only
