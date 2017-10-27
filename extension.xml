@@ -16,7 +16,7 @@
 		</ruleset>
 	</properties>
 
-    <announcement text="Advanced Effects - Extension v2.0, 5E version for Fantasy Grounds\r--by Celestian 2017.09.30" font="emotefont" />
+    <announcement text="Advanced Effects - Extension v2.0\r5E version for Fantasy Grounds\r--by Celestian 2017.09.30" font="emotefont" />
 	<base>		
         <script name="EffectManagerADND" file="scripts/manager_effect_adnd.lua" />
         <script name="AccessManagerADND" file="scripts/manager_access_adnd.lua" />

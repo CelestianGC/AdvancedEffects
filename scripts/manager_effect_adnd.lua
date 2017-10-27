@@ -386,7 +386,7 @@ function isValidCheckEffect(rActor,nodeEffect)
     local bResult = false;
     local nActive = DB.getValue(nodeEffect, "isactive", 0);
     local bItem = false;
-    local bValidItemTriggered = false;
+    local bActionItemUsed = false;
     local bActionOnly = false;
     local nodeItem = nil;
 
@@ -409,20 +409,23 @@ function isValidCheckEffect(rActor,nodeEffect)
             if (node and node ~= nil and nodeItem and nodeItem ) then
                 local sNodePath = nodeItem.getPath();
                 if bActionOnly and sNodePath ~= "" and (sNodePath == rActor.itemPath) then
-                    bValidItemTriggered = true;
+                    bActionItemUsed = true;
                     bItem = true;
                 else
-                    bValidItemTriggered = false;
+                    bActionItemUsed = false;
                     bItem = true; -- is item but doesn't match source path for this effect
                 end
             end
         end
     end
-	if ( nActive ~= 0 and ( not bItem or (bItem and bValidItemTriggered) ) ) then
+    if nActive ~= 0 and bActionOnly and bActionItemUsed then
         bResult = true;
-    end
-    if bActionOnly and not (bItem or bValidItemTriggered) then
+    elseif nActive ~= 0 and not bActionOnly and bActionItemUsed then
+        bResult = true;
+    elseif nActive ~= 0 and bActionOnly and not bActionItemUsed then
         bResult = false;
+    elseif nActive ~= 0 then
+        bResult = true;
     end
     return bResult;
 end

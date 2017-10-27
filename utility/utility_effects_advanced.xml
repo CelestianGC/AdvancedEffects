@@ -109,10 +109,11 @@
                         return true;
                     end
                 </script>
+                <multilinespacing>20</multilinespacing>
 				<anchored to="leftanchor">
 					<top />
 					<left anchor="right" relation="relative" offset="5" />
-                    
+                    <right parent="rightanchor" anchor="left" relation="relative" offset="-20" />
 				</anchored>
                 <readonly />
                 <tooltip textres="item_label_effects_string_tooltip" />
@@ -195,7 +196,7 @@
 					<left offset="97" />
 					<right offset="-110" />
 				</anchored>
-                <tooltip textres="power_label_type_tooltip" />
+                <!-- <tooltip textres="power_label_type_tooltip" /> -->
             </cycler_effecttypes>
             
             <!-- effect / label -->
