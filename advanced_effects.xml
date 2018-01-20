@@ -44,7 +44,19 @@
 		<margins control="0,0,2,2" />
         <script>
             function onInit()
-                if User.isHost() then
+                local node = getDatabaseNode();
+                local bOptionID = OptionsManager.isOption("MIID", "on");
+                local bIDentified = (DB.getValue(node, "isidentified", 0) > 0);
+                local bPCEdit = OptionsManager.isOption("ADND_AE_EDIT", "enabled");
+                local bIsPcItem = string.match(node.getPath(),"^charsheet") ~= null;
+                local bCanEdit = false;
+                
+                if (bIsPcItem and bOptionID and bIDentified and bPCEdit) or 
+                    (bIsPcItem and not bOptionID and bPCEdit) then
+                    bCanEdit = true;
+                end
+                
+                if (User.isHost() or bCanEdit) then
                     header_effects.setVisible(true);
                     effects_iedit.setVisible(true);
                     effects_list_iadd.setVisible(true);
