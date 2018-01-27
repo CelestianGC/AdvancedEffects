@@ -4,7 +4,7 @@
 
 	<properties>
 		<name>5E - Advanced Effects</name>
-		<version>2.2</version>
+		<version>2.3</version>
 		<loadorder>99</loadorder>
 		<description>
 			<text>Advanced Effects, add effects to items and npcs.</text>
@@ -79,7 +79,7 @@
         <string name="check">Check</string>
         <string name="dmg">Damage</string>
         <string name="heal">Heal</string>
-        <string name="init">Initiative</string>
+        <string name="init_ae">Initiative</string>
         <string name="save">Save</string>
 
         <string name="option_label_ADND_AE_EDIT">PC: Adv. Effect Edit</string>

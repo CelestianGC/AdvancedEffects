@@ -121,8 +121,8 @@
 		<button_stringcycler>
 			<parameters>
 				<defaultlabelres mergerule="replace">ac</defaultlabelres>
-				<labelsres>atk|check|dmg|heal|init|save</labelsres>
-                <values>atk|check|dmg|heal|init|save</values>
+				<labelsres>atk|check|dmg|heal|init_ae|save</labelsres>
+                <values>atk|check|dmg|heal|init_ae|save</values>
 			</parameters>
 		</button_stringcycler>
 	</template>
