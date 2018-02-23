@@ -23,6 +23,7 @@
 
         <string name="header_effects">Effect Features</string>
         <string name="item_label_effectfeature">Effect</string>
+      	<string name="item_label_effect_visible">Visibility</string>
         <string name="item_label_effect_visible_tooltip">Always SHOW or HIDE the effect. Default mode shows if item is identified or hides if not.</string>
         <string name="item_label_effects_hide">Hide</string>
         <string name="item_label_effects_show">Show</string>
@@ -60,6 +61,8 @@
         <string name="item_label_savefeature">Feature</string>
         <string name="item_label_effect_attackonly">ActionOnly</string>
         <string name="item_label_effect_attackonly_tooltip">Check this so effect ONLY applied during an attack or damage.</string>
+        
+        <string name="text_MOD">MOD</string>
         <string name="custom">Custom</string>
         <string name="save">Save</string>
         <string name="ability">Ability</string>
