@@ -329,8 +329,14 @@
             <!-- weapon/attack effect only? -->
 			<button_checkbox name="actiononly">
 				<anchored to="visibility" position="righthigh" offset="10,0" width="10" height="20" />
-				<tooltip textres="item_label_effect_attackonly" />
+				<tooltip textres="item_label_effect_attackonly_tooltip" />
 			</button_checkbox>
+      <label>
+        <font>sheetlabelmini</font>
+        <anchored to="actiononly" position="righthigh" offset="2,0"/>
+				<static textres="item_label_effect_attackonly" />
+				<tooltip textres="item_label_effect_attackonly_tooltip" />
+      </label>
             
             
 		</sheetdata>
