@@ -4,7 +4,7 @@
 
 	<properties>
 		<name>5E - Advanced Effects</name>
-		<version>2.5</version>
+		<version>2.6</version>
 		<loadorder>99</loadorder>
 		<description>
 			<text>Advanced Effects, add effects to items and npcs.</text>
@@ -16,10 +16,9 @@
 		</ruleset>
 	</properties>
 
-    <announcement text="Advanced Effects - Extension v2.5\r5E version for Fantasy Grounds\r--by Celestian 2017.09.30" font="emotefont" />
+    <announcement text="Advanced Effects - Extension v2.6\r5E version for Fantasy Grounds\r--by Celestian 2017.09.30" font="emotefont" />
 	<base>		
         <script name="EffectManagerADND" file="scripts/manager_effect_adnd.lua" />
-        <script name="AccessManagerADND" file="scripts/manager_access_adnd.lua" />
 
         <string name="header_effects">Effect Features</string>
         <string name="item_label_effectfeature">Effect</string>
