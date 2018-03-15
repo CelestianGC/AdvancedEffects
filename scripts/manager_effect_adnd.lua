@@ -3,29 +3,95 @@
 --
 --
 -- add the effect if the item is equipped and doesn't exist already
+OOB_MSGTYPE_EFFECTADD = "addeffect";
+OOB_MSGTYPE_EFFECTDELETE = "deleteeffect";
 function onInit()
+  OOBManager.registerOOBMsgHandler(OOB_MSGTYPE_EFFECTADD, handleEffectAdd);
+  OOBManager.registerOOBMsgHandler(OOB_MSGTYPE_EFFECTDELETE, handleEffectDelete);
+
 	CombatManager.setCustomAddPC(addPC);
-    CombatManager.setCustomAddNPC(addNPC);
+  CombatManager.setCustomAddNPC(addNPC);
 
-    --CoreRPG replacements
-    ActionsManager.decodeActors = decodeActors;
-    
-    -- 5E effects replacements
-    EffectManager5E.checkConditionalHelper = checkConditionalHelper;
-    EffectManager5E.getEffectsByType = getEffectsByType;
-    EffectManager5E.hasEffect = hasEffect;
+  --CoreRPG replacements
+  ActionsManager.decodeActors = decodeActors;
+  
+  -- 5E effects replacements
+  EffectManager5E.checkConditionalHelper = checkConditionalHelper;
+  EffectManager5E.getEffectsByType = getEffectsByType;
+  EffectManager5E.hasEffect = hasEffect;
 
-    -- used for AD&D Core ONLY
-    --EffectManager5E.evalAbilityHelper = evalAbilityHelper;
-    
-    -- used for 5E extension ONLY
-    ActionAttack.performRoll = manager_action_attack_performRoll;
-    ActionDamage.performRoll = manager_action_damage_performRoll;
-    PowerManager.performAction = manager_power_performAction;
+  -- used for AD&D Core ONLY
+  --EffectManager5E.evalAbilityHelper = evalAbilityHelper;
+  
+  -- used for 5E extension ONLY
+  ActionAttack.performRoll = manager_action_attack_performRoll;
+  ActionDamage.performRoll = manager_action_damage_performRoll;
+  PowerManager.performAction = manager_power_performAction;
 
     -- option in house rule section, enable/disable allow PCs to edit advanced effects.
 	OptionsManager.registerOption2("ADND_AE_EDIT", false, "option_header_houserule", "option_label_ADND_AE_EDIT", "option_entry_cycler", 
 			{ labels = "option_label_ADND_AE_enabled" , values = "enabled", baselabel = "option_label_ADND_AE_disabled", baseval = "disabled", default = "disabled" });    
+end
+
+-- notify oob to deal with this
+function notifyEffectAdd(nodeEntry, rEffect)
+	local msgOOB = {};
+	msgOOB.type = OOB_MSGTYPE_EFFECTADD;
+  msgOOB.nodeEntry = nodeEntry.getPath();
+
+  msgOOB.effectDuration = rEffect.nDuration;
+  msgOOB.effectName     = rEffect.sName;
+  msgOOB.effectLabel    = rEffect.sLabel;
+  msgOOB.effectUnit     = rEffect.sUnits;
+  msgOOB.effectInit     = rEffect.nInit;
+  msgOOB.effectSource   = rEffect.sSource or nil;
+  msgOOB.effectDMOnly   = rEffect.nGMOnly;
+  msgOOB.effectApply    = rEffect.sApply or nil;
+
+	Comm.deliverOOBMessage(msgOOB, "");
+end
+
+-- oob takes control and makes change (sends to apply)
+function handleEffectAdd(msgOOB)
+  local nodeEntry = DB.findNode(msgOOB.nodeEntry);
+
+  local rEffect     = {};
+  rEffect.nDuration = msgOOB.effectDuration;
+  rEffect.sName     = msgOOB.effectName;
+  rEffect.sLabel    = msgOOB.effectLabel; 
+  rEffect.sUnits    = msgOOB.effectUnit;
+  rEffect.nInit     = msgOOB.effectInit;
+  rEffect.sSource   = msgOOB.effectSource;
+  rEffect.nGMOnly   = msgOOB.effectDMOnly;
+  rEffect.sApply    = msgOOB.effectApply;
+
+  local bFound = false;
+  for _,nodeEffect in pairs(DB.getChildren(nodeEntry, "effects")) do
+    local sEffSource = DB.getValue(nodeEffect, "source_name", "");
+    if (sEffSource == rEffect.sSource) then
+      bFound = true;
+    end -- was active
+  end -- nodeEffect for
+  if not bFound then
+    EffectManager.addEffect("", "", nodeEntry, rEffect, false);
+  end
+end
+
+-- notify oob to deal with this
+function notifyEffectDelete(nodeEffect)
+	local msgOOB = {};
+	msgOOB.type = OOB_MSGTYPE_EFFECTDELETE;
+  msgOOB.nodeEffect = nodeEffect.getPath();
+
+	Comm.deliverOOBMessage(msgOOB, "");
+end
+
+-- oob takes control and makes change (sends to apply)
+function handleEffectDelete(msgOOB)
+  local nodeEffect = DB.findNode(msgOOB.nodeEffect);
+  if nodeEffect ~= nil then
+    nodeEffect.delete();
+  end
 end
 
 function updateItemEffects(nodeItem)
@@ -74,7 +140,8 @@ function updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquipped, nId
                     bFound = true;
                     if (not bEquipped) then
                         sendEffectRemovedMessage(nodeChar, nodeEffect, sLabel, nDMOnly, sUser)
-                        nodeEffect.delete();
+                        notifyEffectDelete(nodeEffect);
+                        --nodeEffect.delete();
                         break;
                     end -- not equipped
                 end -- effect source == item source
@@ -111,8 +178,10 @@ function updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquipped, nId
             rEffect.sSource = sItemSource;
             rEffect.nGMOnly = nDMOnly;
             rEffect.sApply = "";
-            EffectManager.addEffect("", "", nodeChar, rEffect, false);
+            
+            --EffectManager.addEffect("", "", nodeChar, rEffect, false);
             sendEffectAddedMessage(nodeChar, rEffect, sLabel, nDMOnly, sUser)
+            notifyEffectAdd(nodeChar,rEffect);
         end
     end
 end
@@ -171,8 +240,10 @@ function updateCharEffect(nodeCharEffect,nodeEntry)
     --rEffect.sSource = nodeEntry.getPath();
     rEffect.nGMOnly = nDMOnly;
     rEffect.sApply = "";
-    EffectManager.addEffect("", "", nodeEntry, rEffect, false);
+
+    --EffectManager.addEffect("", "", nodeEntry, rEffect, false);
     sendEffectAddedMessage(nodeEntry, rEffect, sLabel, nDMOnly, sUser);
+    notifyEffectAdd(nodeEntry,rEffect);
 end
 
 -- custom version of the one in CoreRPG to deal with adding new 
@@ -210,7 +281,7 @@ function addPC(nodePC)
 
     -- make sure active users get ownership of their CT nodes
     -- otherwise effects applied by items/etc won't work.
-    AccessManagerADND.manageCTOwners(nodeEntry);
+    --AccessManagerADND.manageCTOwners(nodeEntry);
 end
 
 -- copied the base addNPC from manager_combat2.lua from 5E ruleset for this and
