@@ -6,7 +6,7 @@
 -->
 
 <root>
-	<template name="list_charinv" merge="replace">
+<!-- 	<template name="list_charinv" merge="replace">
 		<windowlist>
 			<child></child>
 			<child><backcolor>1A40301E</backcolor></child>
@@ -15,11 +15,11 @@
 			<allowdelete />
 			<script file="campaign/scripts/char_invlist_adnd.lua" />
 		</windowlist>
-	</template>
+	</template> -->
     
 	<windowclass name="char_weapon" merge="join">
 		<script file="campaign/scripts/char_weapon_adnd.lua" merge="replace" />
-    </windowclass>
+  </windowclass>
 
 	<windowclass name="item_main" merge="join">
         <sheetdata>
