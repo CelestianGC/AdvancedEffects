@@ -55,7 +55,7 @@ function update()
         --local nDuration = tonumber(sDuration);
         local bMultiple = (sDurDice ~= "") or (nDurationMod > 1);
         if sUnits == "minute" then
-            sDuration = sDuration .. " turn";
+            sDuration = sDuration .. " minute"; -- 5e uses minutes, not turns!
         elseif sUnits == "hour" then
             sDuration = sDuration .. " hour";
         elseif sUnits == "day" then
