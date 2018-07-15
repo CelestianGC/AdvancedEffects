@@ -45,14 +45,13 @@
         <script>
             function onInit()
                 local node = getDatabaseNode();
-                local bOptionID = OptionsManager.isOption("MIID", "on");
                 local bIDentified = (DB.getValue(node, "isidentified", 0) > 0);
                 local bPCEdit = OptionsManager.isOption("ADND_AE_EDIT", "enabled");
                 local bIsPcItem = string.match(node.getPath(),"^charsheet") ~= null;
                 local bCanEdit = false;
                 
-                if (bIsPcItem and bOptionID and bIDentified and bPCEdit) or 
-                    (bIsPcItem and not bOptionID and bPCEdit) then
+                if (bIsPcItem and bIDentified and bPCEdit) or 
+                    (bIsPcItem and bPCEdit) then
                     bCanEdit = true;
                 end
                 

@@ -14,7 +14,8 @@ function onInit()
     DB.addHandler("combattracker.list.*.inventorylist.*.effectlist.*.durunit", "onUpdate", updateItemEffectsForEdit);
     DB.addHandler("combattracker.list.*.inventorylist.*.effectlist.*.visibility", "onUpdate", updateItemEffectsForEdit);
     DB.addHandler("combattracker.list.*.inventorylist.*.effectlist.*.actiononly", "onUpdate", updateItemEffectsForEdit);
-    DB.addHandler("combattracker.list.*.inventorylist.*", "onChildDeleted", updateFromDeletedInventory);
+    DB.addHandler("combattracker.list.*.inventorylist.*.isidentified", "onUpdate", updateItemEffectsForEdit);
+    DB.addHandler("combattracker.list.*.inventorylist", "onChildDeleted", updateFromDeletedInventory);
 
     -- watch the character/pc inventory list
     DB.addHandler("charsheet.*.inventorylist.*.carried", "onUpdate", inventoryUpdateItemEffects);
@@ -25,7 +26,8 @@ function onInit()
     DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.durunit", "onUpdate", updateItemEffectsForEdit);
     DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.visibility", "onUpdate", updateItemEffectsForEdit);
     DB.addHandler("charsheet.*.inventorylist.*.effectlist.*.actiononly", "onUpdate", updateItemEffectsForEdit);
-    DB.addHandler("charsheet.*.inventorylist.*", "onChildDeleted", updateFromDeletedInventory);
+    DB.addHandler("charsheet.*.inventorylist.*.isidentified", "onUpdate", updateItemEffectsForEdit);
+    DB.addHandler("charsheet.*.inventorylist", "onChildDeleted", updateFromDeletedInventory);
   end
 	CombatManager.setCustomAddPC(addPC);
   CombatManager.setCustomAddNPC(addNPC);
@@ -57,30 +59,42 @@ function inventoryUpdateItemEffects(nodeField)
 end
 -- update single item from edit for *.effect handler
 function updateItemEffectsForEdit(nodeField)
-    checkEffectsAfterEdit(DB.getChild(nodeField, ".."));
+  checkEffectsAfterEdit(nodeField.getChild(".."));
 end
 -- find the effect for this source and delete and re-build
 function checkEffectsAfterEdit(itemNode)
-    local nodeChar = DB.getChild(itemNode, ".....");
-    local nodeCT = getCTNodeByNodeChar(nodeChar);
-    if nodeCT then
-        for _,nodeEffect in pairs(DB.getChildren(nodeCT, "effects")) do
-            local sLabel = DB.getValue(nodeEffect, "label", "");
-            local sEffSource = DB.getValue(nodeEffect, "source_name", "");
-            -- see if the node exists and if it's in an inventory node
-            local nodeFound = DB.findNode(sEffSource);
---Debug.console("manager_effect_adnd.lua","checkEffectsAfterEdit","sEffSource",sEffSource);
---Debug.console("manager_effect_adnd.lua","checkEffectsAfterEdit","nodeFound",nodeFound);
-            if nodeFound and nodeFound == itemNode and string.match(sEffSource,"inventorylist") then
-                nodeEffect.delete();
-                updateItemEffects(DB.getChild(itemNode, "..."));
-            end
+  local nodeChar = nil
+  local bIDUpdated = false;
+  if itemNode.getPath():match("%.effectlist%.") then
+    nodeChar = DB.getChild(itemNode, ".....");
+  else
+    nodeChar = DB.getChild(itemNode, "...");
+    bIDUpdated = true;
+  end
+  local nodeCT = getCTNodeByNodeChar(nodeChar);
+  if nodeCT then
+    for _,nodeEffect in pairs(DB.getChildren(nodeCT, "effects")) do
+      local sLabel = DB.getValue(nodeEffect, "label", "");
+      local sEffSource = DB.getValue(nodeEffect, "source_name", "");
+      -- see if the node exists and if it's in an inventory node
+      local nodeEffectFound = DB.findNode(sEffSource);
+      if (nodeEffectFound  and string.match(sEffSource,"inventorylist")) then
+        local nodeEffectItem = nodeEffectFound.getChild("...");
+        if nodeEffectFound == itemNode then -- effect hide/show edit
+          nodeEffect.delete();
+          updateItemEffects(DB.getChild(itemNode, "..."));
+        elseif nodeEffectItem == itemNode then -- id state was changed
+          nodeEffect.delete();
+          updateItemEffects(nodeEffectItem);
         end
+      end
     end
+  end
 end
 -- this checks to see if an effect is missing a associated item that applied the effect 
 -- when items are deleted and then clears that effect if it's missing.
 function updateFromDeletedInventory(node)
+--Debug.console("manager_effect_adnd.lua","updateFromDeletedInventory","node",node);
     local nodeChar = DB.getChild(node, "..");
     local bisNPC = (not ActorManager.isPC(nodeChar));
     local nodeTarget = nodeChar;
@@ -149,17 +163,17 @@ function updateItemEffects(nodeItem)
     if not nodeChar then
         return;
     end
-    
+
     local nCarried = DB.getValue(nodeItem, "carried", 0);
     local bEquipped = (nCarried == 2);
-    local nIdentified = DB.getValue(nodeItem, "isidentified", 0);
-    local bOptionID = OptionsManager.isOption("MIID", "on");
-    if not bOptionID then 
-        nIdentified = 1;
-    end
+    local nIdentified = DB.getValue(nodeItem, "isidentified", 1);
+    -- local bOptionID = OptionsManager.isOption("MIID", "on");
+    -- if not bOptionID then 
+        -- nIdentified = 1;
+    -- end
 
     for _,nodeItemEffect in pairs(DB.getChildren(nodeItem, "effectlist")) do
-        updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquipped, nIdentified);
+        updateItemEffect(nodeItemEffect, sName, nodeChar, nil, bEquipped, nIdentified);
     end -- for item's effects list
 end
 
@@ -168,6 +182,8 @@ function updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquipped, nId
     local sCharacterName = DB.getValue(nodeChar, "name", "");
     local sItemSource = nodeItemEffect.getPath();
     local sLabel = DB.getValue(nodeItemEffect, "effect", "");
+-- Debug.console("manager_effect_adnd.lua","updateItemEffect","bEquipped",bEquipped);    
+-- Debug.console("manager_effect_adnd.lua","updateItemEffect","nodeItemEffect",nodeItemEffect);  
     if sLabel and sLabel ~= "" then -- if we have effect string
         local bFound = false;
         for _,nodeEffect in pairs(DB.getChildren(nodeChar, "effects")) do
@@ -198,14 +214,14 @@ function updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquipped, nId
             end
             local nDMOnly = 0;
             local sVisibility = DB.getValue(nodeItemEffect, "visibility", "");
-            if sVisibility == "show" then
-                nDMOnly = 0;
-            elseif sVisibility == "hide" then
+            if sVisibility == "hide" then
                 nDMOnly = 1;
-            elseif nIdentified > 0 then
+            elseif sVisibility == "show"  then
                 nDMOnly = 0;
             elseif nIdentified == 0 then
                 nDMOnly = 1;
+            elseif nIdentified > 0  then
+                nDMOnly = 0;
             end
             
             rEffect.nDuration = nRollDuration;
