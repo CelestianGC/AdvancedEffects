@@ -163,6 +163,11 @@ function onDamageAction(draginfo)
 		if sDmgAbility == "base" then
 			sDmgAbility = sBaseAbility;
 		end
+		local nAbilityBonus = ActorManager2.getAbilityBonus(rActor, sDmgAbility);
+		local nMult = DB.getValue(v, "statmult", 1);
+		if nAbilityBonus > 0 and nMult ~= 1 then
+			nAbilityBonus = math.floor(nMult * nAbilityBonus);
+		end
 		local aDmgDice = DB.getValue(v, "dice", {});
 		local aDmgReroll = nil;
 		if rAction.nReroll then
@@ -171,10 +176,10 @@ function onDamageAction(draginfo)
 				aDmgReroll[kDie] = rAction.nReroll;
 			end
 		end
-		local nDmgMod = DB.getValue(v, "bonus", 0) + ActorManager2.getAbilityBonus(rActor, sDmgAbility);
+		local nDmgMod = nAbilityBonus + DB.getValue(v, "bonus", 0);
 		local sDmgType = DB.getValue(v, "type", "");
 		
-		table.insert(rAction.clauses, { dice = aDmgDice, stat = sDmgAbility, modifier = nDmgMod, dmgtype = sDmgType, reroll = aDmgReroll });
+		table.insert(rAction.clauses, { dice = aDmgDice, stat = sDmgAbility, statmult = nMult, modifier = nDmgMod, dmgtype = sDmgType, reroll = aDmgReroll });
 	end
 	
 	ActionDamage.performRoll(draginfo, rActor, rAction);
@@ -222,7 +227,12 @@ function onDamageChanged()
 			sAbility = sBaseAbility;
 		end
 		if sAbility ~= "" then
-			nMod = nMod + ActorManager2.getAbilityBonus(rActor, sAbility);
+			local nAbilityBonus = ActorManager2.getAbilityBonus(rActor, sAbility);
+			local nMult = DB.getValue(v, "statmult", 1);
+			if nAbilityBonus > 0 and nMult ~= 1 then
+				nAbilityBonus = math.floor(nMult * nAbilityBonus);
+			end
+			nMod = nMod + nAbilityBonus;
 		end
 		
 		local aDice = DB.getValue(v, "dice", {});
