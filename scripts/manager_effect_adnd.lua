@@ -179,64 +179,69 @@ end
 
 -- update single effect for item
 function updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquipped, nIdentified)
-    local sCharacterName = DB.getValue(nodeChar, "name", "");
-    local sItemSource = nodeItemEffect.getPath();
-    local sLabel = DB.getValue(nodeItemEffect, "effect", "");
+  local sCharacterName = DB.getValue(nodeChar, "name", "");
+  local sItemSource = nodeItemEffect.getPath();
+  local sLabel = DB.getValue(nodeItemEffect, "effect", "");
 -- Debug.console("manager_effect_adnd.lua","updateItemEffect","bEquipped",bEquipped);    
 -- Debug.console("manager_effect_adnd.lua","updateItemEffect","nodeItemEffect",nodeItemEffect);  
-    if sLabel and sLabel ~= "" then -- if we have effect string
-        local bFound = false;
-        for _,nodeEffect in pairs(DB.getChildren(nodeChar, "effects")) do
-            local nActive = DB.getValue(nodeEffect, "isactive", 0);
-            local nDMOnly = DB.getValue(nodeEffect, "isgmonly", 0);
-            if (nActive ~= 0) then
-                local sEffSource = DB.getValue(nodeEffect, "source_name", "");
-                if (sEffSource == sItemSource) then
-                    bFound = true;
-                    if (not bEquipped) then
-                        sendEffectRemovedMessage(nodeChar, nodeEffect, sLabel, nDMOnly, sUser)
-                        nodeEffect.delete();
-                        break;
-                    end -- not equipped
-                end -- effect source == item source
-            end -- was active
-        end -- nodeEffect for
-        
-        if (not bFound and bEquipped) then
-            local rEffect = {};
-            local nRollDuration = 0;
-            local dDurationDice = DB.getValue(nodeItemEffect, "durdice");
-            local nModDice = DB.getValue(nodeItemEffect, "durmod", 0);
-            if (dDurationDice and dDurationDice ~= "") then
-                nRollDuration = StringManager.evalDice(dDurationDice, nModDice);
-            else
-                nRollDuration = nModDice;
-            end
-            local nDMOnly = 0;
-            local sVisibility = DB.getValue(nodeItemEffect, "visibility", "");
-            if sVisibility == "hide" then
-                nDMOnly = 1;
-            elseif sVisibility == "show"  then
-                nDMOnly = 0;
-            elseif nIdentified == 0 then
-                nDMOnly = 1;
-            elseif nIdentified > 0  then
-                nDMOnly = 0;
-            end
-            
-            rEffect.nDuration = nRollDuration;
-            rEffect.sName = sName .. ";" .. sLabel;
-            rEffect.sLabel = sLabel; 
-            rEffect.sUnits = DB.getValue(nodeItemEffect, "durunit", "");
-            rEffect.nInit = 0;
-            rEffect.sSource = sItemSource;
-            rEffect.nGMOnly = nDMOnly;
-            rEffect.sApply = "";
-            
-            sendEffectAddedMessage(nodeChar, rEffect, sLabel, nDMOnly, sUser)
-            EffectManager.addEffect("", "", nodeChar, rEffect, false);
-        end
+  if sLabel and sLabel ~= "" then -- if we have effect string
+    local bFound = false;
+    for _,nodeEffect in pairs(DB.getChildren(nodeChar, "effects")) do
+      local nActive = DB.getValue(nodeEffect, "isactive", 0);
+      local nDMOnly = DB.getValue(nodeEffect, "isgmonly", 0);
+      if (nActive ~= 0) then
+        local sEffSource = DB.getValue(nodeEffect, "source_name", "");
+        if (sEffSource == sItemSource) then
+          bFound = true;
+          if (not bEquipped) then
+            sendEffectRemovedMessage(nodeChar, nodeEffect, sLabel, nDMOnly, sUser)
+            nodeEffect.delete();
+            break;
+          end -- not equipped
+        end -- effect source == item source
+      end -- was active
+    end -- nodeEffect for
+      
+    if (not bFound and bEquipped) then
+      local rEffect = {};
+      local nRollDuration = 0;
+      local dDurationDice = DB.getValue(nodeItemEffect, "durdice");
+      local nModDice = DB.getValue(nodeItemEffect, "durmod", 0);
+      if (dDurationDice and dDurationDice ~= "") then
+        nRollDuration = StringManager.evalDice(dDurationDice, nModDice);
+      else
+        nRollDuration = nModDice;
+      end
+      local nDMOnly = 0;
+      local sVisibility = DB.getValue(nodeItemEffect, "visibility", "");
+      if sVisibility == "hide" then
+        nDMOnly = 1;
+      elseif sVisibility == "show"  then
+        nDMOnly = 0;
+      elseif nIdentified == 0 then
+        nDMOnly = 1;
+      elseif nIdentified > 0  then
+        nDMOnly = 0;
+      end
+      
+      local bTokenVis = (DB.getValue(nodeChar,"tokenvis",1) == 1);
+      if not bTokenVis then
+        nDMOnly = 1; -- hide if token not visible
+      end
+      
+      rEffect.nDuration = nRollDuration;
+      rEffect.sName = sName .. ";" .. sLabel;
+      rEffect.sLabel = sLabel; 
+      rEffect.sUnits = DB.getValue(nodeItemEffect, "durunit", "");
+      rEffect.nInit = 0;
+      rEffect.sSource = sItemSource;
+      rEffect.nGMOnly = nDMOnly;
+      rEffect.sApply = "";
+      
+      sendEffectAddedMessage(nodeChar, rEffect, sLabel, nDMOnly, sUser)
+      EffectManager.addEffect("", "", nodeChar, rEffect, false);
     end
+  end
 end
 
 
@@ -265,37 +270,42 @@ end
 -- nodeCharEffect: node in effectlist on PC/NPC
 -- nodeEntry: node in combat tracker for PC/NPC
 function updateCharEffect(nodeCharEffect,nodeEntry)
-    local sUser = User.getUsername();
-    local sName = DB.getValue(nodeEntry, "name", "");
-    local sLabel = DB.getValue(nodeCharEffect, "effect", "");
-    local nRollDuration = 0;
-    local dDurationDice = DB.getValue(nodeCharEffect, "durdice");
-    local nModDice = DB.getValue(nodeCharEffect, "durmod", 0);
-    if (dDurationDice and dDurationDice ~= "") then
-        nRollDuration = StringManager.evalDice(dDurationDice, nModDice);
-    else
-        nRollDuration = nModDice;
-    end
-    local nDMOnly = 0;
-    local sVisibility = DB.getValue(nodeCharEffect, "visibility", "");
-    if sVisibility == "show" then
-        nDMOnly = 0;
-    elseif sVisibility == "hide" then
-        nDMOnly = 1;
-    end
-    local rEffect = {};
-    rEffect.nDuration = nRollDuration;
-    --rEffect.sName = sName .. ";" .. sLabel;
-    rEffect.sName = sLabel;
-    rEffect.sLabel = sLabel; 
-    rEffect.sUnits = DB.getValue(nodeCharEffect, "durunit", "");
-    rEffect.nInit = 0;
-    --rEffect.sSource = nodeEntry.getPath();
-    rEffect.nGMOnly = nDMOnly;
-    rEffect.sApply = "";
+  local sUser = User.getUsername();
+  local sName = DB.getValue(nodeEntry, "name", "");
+  local sLabel = DB.getValue(nodeCharEffect, "effect", "");
+  local nRollDuration = 0;
+  local dDurationDice = DB.getValue(nodeCharEffect, "durdice");
+  local nModDice = DB.getValue(nodeCharEffect, "durmod", 0);
+  if (dDurationDice and dDurationDice ~= "") then
+      nRollDuration = StringManager.evalDice(dDurationDice, nModDice);
+  else
+      nRollDuration = nModDice;
+  end
+  local nDMOnly = 0;
+  local sVisibility = DB.getValue(nodeCharEffect, "visibility", "");
+  if sVisibility == "show" then
+      nDMOnly = 0;
+  elseif sVisibility == "hide" then
+      nDMOnly = 1;
+  end
+  local bisPC = (ActorManager.getType(nodeEntry) == "pc");
+  if (not bisPC) then
+    bDMOnly = 1; -- npcs effects always hidden from PCs/chat when we first drag/drop into CT
+  end
+  
+  local rEffect = {};
+  rEffect.nDuration = nRollDuration;
+  --rEffect.sName = sName .. ";" .. sLabel;
+  rEffect.sName = sLabel;
+  rEffect.sLabel = sLabel; 
+  rEffect.sUnits = DB.getValue(nodeCharEffect, "durunit", "");
+  rEffect.nInit = 0;
+  --rEffect.sSource = nodeEntry.getPath();
+  rEffect.nGMOnly = nDMOnly;
+  rEffect.sApply = "";
 
-    sendEffectAddedMessage(nodeEntry, rEffect, sLabel, nDMOnly, sUser);
-    EffectManager.addEffect("", "", nodeEntry, rEffect, false);
+  sendEffectAddedMessage(nodeEntry, rEffect, sLabel, nDMOnly, sUser);
+  EffectManager.addEffect("", "", nodeEntry, rEffect, false);
 end
 
 -- custom version of the one in CoreRPG to deal with adding new 
