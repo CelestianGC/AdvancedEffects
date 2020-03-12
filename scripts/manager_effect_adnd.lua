@@ -290,7 +290,7 @@ function updateCharEffect(nodeCharEffect,nodeEntry)
   end
   local bisPC = (ActorManager.getType(nodeEntry) == "pc");
   if (not bisPC) then
-    bDMOnly = 1; -- npcs effects always hidden from PCs/chat when we first drag/drop into CT
+    nDMOnly = 1; -- npcs effects always hidden from PCs/chat when we first drag/drop into CT
   end
   
   local rEffect = {};
