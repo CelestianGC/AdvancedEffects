@@ -224,9 +224,12 @@ function updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquipped, nId
         nDMOnly = 0;
       end
       
-      local bTokenVis = (DB.getValue(nodeChar,"tokenvis",1) == 1);
-      if not bTokenVis then
-        nDMOnly = 1; -- hide if token not visible
+      local isNPC = isCTNodeNPC(nodeChar);            
+      if isNPC then
+        local bTokenVis = (DB.getValue(nodeChar,"tokenvis",1) == 1);
+        if not bTokenVis then
+          nDMOnly = 1; -- hide if token not visible
+        end
       end
       
       rEffect.nDuration = nRollDuration;
@@ -1039,4 +1042,14 @@ function manager_power_performAction(draginfo, rActor, rAction, nodePower)
 		ActionsManager.performMultiAction(draginfo, rActor, rRolls[1].sType, rRolls);
 	end
 	return true;
+end
+
+-- return boolean, is NPC from CT node test
+function isCTNodeNPC(nodeCT)
+  local isPC = false;
+  local sClassLink, sRecordLink = DB.getValue(nodeCT,"link","","");
+  if sClassLink == 'npc' then
+    isPC = true;
+  end
+  return isPC;
 end
