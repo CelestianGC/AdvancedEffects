@@ -356,7 +356,8 @@ function addNPC(sClass, nodeNPC, sName)
 	
 	-- Fill in spells
 	CampaignDataManager2.updateNPCSpells(nodeEntry);
-	
+	CampaignDataManager2.resetNPCSpellcastingSlots(nodeEntry);
+		
 	-- Determine size
 	local sSize = StringManager.trim(DB.getValue(nodeEntry, "size", ""):lower());
 	if sSize == "large" then
