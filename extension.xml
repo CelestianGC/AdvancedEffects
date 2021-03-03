@@ -3,7 +3,7 @@
 
 	<properties>
 		<name>5E - Advanced Effects</name>
-		<version>4.7</version>
+		<version>4.8</version>
 		<loadorder>99</loadorder>
 		<description>
 			<text>Advanced Effects, add effects to pc, npcs and items.</text>
@@ -11,11 +11,11 @@
 			<author>Celestian</author>
 		</description>
 		<ruleset>
-      <name>5E</name>
+          <name>5E</name>
 		</ruleset>
 	</properties>
 
-	<announcement text="Advanced Effects - 5E v4.7\rby Celestian, 2017-2020" font="emotefont" icon="celestian" />
+	<announcement text="Advanced Effects - 5E v4.8\rby Celestian, 2017-2020" font="emotefont" icon="celestian" />
 	<base>		
 	<icon name="celestian" file="graphics/icons/celestian.png" />
 	

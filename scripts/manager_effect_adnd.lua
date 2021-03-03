@@ -4,7 +4,7 @@
 --
 -- add the effect if the item is equipped and doesn't exist already
 function onInit()
-  if User.isHost() then
+  if Session.isHost then
     -- watch the combatracker/npc inventory list
     DB.addHandler("combattracker.list.*.inventorylist.*.carried", "onUpdate", inventoryUpdateItemEffects);
     DB.addHandler("combattracker.list.*.inventorylist.*.effectlist.*.effect", "onUpdate", updateItemEffectsForEdit);
@@ -325,6 +325,10 @@ function addPC(nodePC)
 		return;
 	end
 	
+	-- add this to make the npc show up first time for Situational Awareness
+	DB.setValue(nodeEntry,"ct.visible","number",1);
+	--
+
 	-- Set up the CT specific information
 	DB.setValue(nodeEntry, "link", "windowreference", "charsheet", nodePC.getNodeName());
 	DB.setValue(nodeEntry, "friendfoe", "string", "friend");
@@ -354,6 +358,10 @@ end
 function addNPC(sClass, nodeNPC, sName)
 	local nodeEntry, nodeLastMatch = CombatManager.addNPCHelper(nodeNPC, sName);
 	
+	-- add this to make the npc show up first time for Situational Awareness
+	DB.setValue(nodeEntry,"ct.visible","number",1);
+	--
+
 	-- Fill in spells
 	CampaignDataManager2.updateNPCSpells(nodeEntry);
 	CampaignDataManager2.resetNPCSpellcastingSlots(nodeEntry);
@@ -610,21 +618,21 @@ function evalAbilityHelper(rActor, sEffectAbility)
 	
 	-- local nAbility = nil;
 	-- if sShortAbility == "STR" then
-		-- nAbility = ActorManager2.getAbilityBonus(rActor, "strength");
+		-- nAbility = ActorManager5E.getAbilityBonus(rActor, "strength");
 	-- elseif sShortAbility == "DEX" then
-		-- nAbility = ActorManager2.getAbilityBonus(rActor, "dexterity");
+		-- nAbility = ActorManager5E.getAbilityBonus(rActor, "dexterity");
 	-- elseif sShortAbility == "CON" then
-		-- nAbility = ActorManager2.getAbilityBonus(rActor, "constitution");
+		-- nAbility = ActorManager5E.getAbilityBonus(rActor, "constitution");
 	-- elseif sShortAbility == "INT" then
-		-- nAbility = ActorManager2.getAbilityBonus(rActor, "intelligence");
+		-- nAbility = ActorManager5E.getAbilityBonus(rActor, "intelligence");
 	-- elseif sShortAbility == "WIS" then
-		-- nAbility = ActorManager2.getAbilityBonus(rActor, "wisdom");
+		-- nAbility = ActorManager5E.getAbilityBonus(rActor, "wisdom");
 	-- elseif sShortAbility == "CHA" then
-		-- nAbility = ActorManager2.getAbilityBonus(rActor, "charisma");
+		-- nAbility = ActorManager5E.getAbilityBonus(rActor, "charisma");
 	-- elseif sShortAbility == "LVL" then
-		-- nAbility = ActorManager2.getAbilityBonus(rActor, "level");
+		-- nAbility = ActorManager5E.getAbilityBonus(rActor, "level");
 	-- elseif sShortAbility == "PRF" then
-		-- nAbility = ActorManager2.getAbilityBonus(rActor, "prf");
+		-- nAbility = ActorManager5E.getAbilityBonus(rActor, "prf");
 	-- end
 	
 	-- if nAbility then

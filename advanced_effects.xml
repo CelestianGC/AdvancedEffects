@@ -54,7 +54,7 @@
                     bCanEdit = true;
                 end
                 
-                if (User.isHost() or bCanEdit) then
+                if (Session.isHost or bCanEdit) then
                     header_effects.setVisible(true);
                     effects_iedit.setVisible(true);
                     effects_list_iadd.setVisible(true);
