@@ -11,7 +11,7 @@
 		<margins control="0,0,2,2" />
         <script>
             function onInit()
-                if Session.isHost then
+                if Session.IsHost then
                     header_effects.setVisible(true);
                     effects_iedit.setVisible(true);
                     effects_list_iadd.setVisible(true);

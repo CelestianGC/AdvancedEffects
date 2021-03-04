@@ -128,7 +128,7 @@ end
 
 
 function updateAbilityEffects()
-    if not Session.isHost then
+    if not Session.IsHost then
         return;
     end
     
@@ -163,7 +163,7 @@ function updateAbilityEffects()
 end
 
 function updateSaveEffects()
-    if not Session.isHost then
+    if not Session.IsHost then
         return;
     end
     local nodeRecord = getDatabaseNode();
@@ -190,7 +190,7 @@ function updateSaveEffects()
 end
 
 function updateSusceptibleEffects()
-    if not Session.isHost then
+    if not Session.IsHost then
         return;
     end
     local nodeRecord = getDatabaseNode();
@@ -218,7 +218,7 @@ function updateSusceptibleEffects()
 end
 
 function updateMiscEffects()
-    if not Session.isHost then
+    if not Session.IsHost then
         return;
     end
     local nodeRecord = getDatabaseNode();

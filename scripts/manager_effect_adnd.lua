@@ -4,7 +4,7 @@
 --
 -- add the effect if the item is equipped and doesn't exist already
 function onInit()
-  if Session.isHost then
+  if Session.IsHost then
     -- watch the combatracker/npc inventory list
     DB.addHandler("combattracker.list.*.inventorylist.*.carried", "onUpdate", inventoryUpdateItemEffects);
     DB.addHandler("combattracker.list.*.inventorylist.*.effectlist.*.effect", "onUpdate", updateItemEffectsForEdit);
