@@ -71,7 +71,7 @@ function checkEffectsAfterEdit(itemNode)
     nodeChar = DB.getChild(itemNode, "...");
     bIDUpdated = true;
   end
-  local nodeCT = getCTNodeByNodeChar(nodeChar);
+  local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(nodeChar));
   if nodeCT then
     for _,nodeEffect in pairs(DB.getChildren(nodeCT, "effects")) do
       local sLabel = DB.getValue(nodeEffect, "label", "");
@@ -98,7 +98,7 @@ function updateFromDeletedInventory(node)
     local nodeChar = DB.getChild(node, "..");
     local bisNPC = (not ActorManager.isPC(nodeChar));
     local nodeTarget = nodeChar;
-    local nodeCT = getCTNodeByNodeChar(nodeChar);
+    local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(nodeChar));
     -- if we're already in a combattracker situation (npcs)
     if bisNPC and string.match(nodeChar.getPath(),"^combattracker") then
         nodeCT = nodeChar;
@@ -157,7 +157,7 @@ function updateItemEffects(nodeItem)
     -- we swap the node to the combat tracker node
     -- so the "effect" is written to the right node
     if not string.match(nodeChar.getPath(),"^combattracker") then
-        nodeChar = getCTNodeByNodeChar(nodeChar);
+        nodeChar = ActorManager.getCTNode(ActorManager.resolveActor(nodeChar));
     end
     -- if not in the combat tracker bail
     if not nodeChar then
@@ -224,8 +224,7 @@ function updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquipped, nId
         nDMOnly = 0;
       end
       
-      local isNPC = isCTNodeNPC(nodeChar);            
-      if isNPC then
+      if not ActorManager.isPC(nodeChar) then
         local bTokenVis = (DB.getValue(nodeChar,"tokenvis",1) == 1);
         if not bTokenVis then
           nDMOnly = 1; -- hide if token not visible
@@ -245,20 +244,6 @@ function updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquipped, nId
       EffectManager.addEffect("", "", nodeChar, rEffect, false);
     end
   end
-end
-
-
--- return the CTnode by using character sheet node 
-function getCTNodeByNodeChar(nodeChar)
-    local nodeCT = nil;
-	for _,node in pairs(DB.getChildren("combattracker.list")) do
-        local _, sRecord = DB.getValue(node, "link", "", "");
-        if sRecord ~= "" and sRecord == nodeChar.getPath() then
-            nodeCT = node;
-            break;
-        end
-    end
-    return nodeCT;
 end
 
 -- flip through all npc effects (generally do this in addNPC()/addPC()
@@ -1051,14 +1036,4 @@ function manager_power_performAction(draginfo, rActor, rAction, nodePower)
 		ActionsManager.performMultiAction(draginfo, rActor, rRolls[1].sType, rRolls);
 	end
 	return true;
-end
-
--- return boolean, is NPC from CT node test
-function isCTNodeNPC(nodeCT)
-  local isPC = false;
-  local sClassLink, sRecordLink = DB.getValue(nodeCT,"link","","");
-  if sClassLink == 'npc' then
-    isPC = true;
-  end
-  return isPC;
 end
