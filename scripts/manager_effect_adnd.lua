@@ -34,7 +34,7 @@ function onInit()
 
   -- back up old CoreRPG functions
   addPC_old = CombatManager.addPC;
-  addNPC_old = CombatManager2.addNPC;
+  addNPC_old = CombatManager.addNPC;
 
   -- CoreRPG replacements
   ActionsManager.decodeActors = decodeActors;
