@@ -911,23 +911,17 @@ function checkConditionalHelper(rActor, sEffect, rTarget, aIgnore)
 	local bReturn = false;
 	
 	for _,v in pairs(DB.getChildren(ActorManager.getCTNode(rActor), "effects")) do
-		local nActive = DB.getValue(v, "isactive", 0);
-    if (EffectManagerADND.isValidCheckEffect(rActor,v) and not StringManager.contains(aIgnore, v.getNodeName())) then
+		if (EffectManagerADND.isValidCheckEffect(rActor,v) and not StringManager.contains(aIgnore, v.getNodeName())) then
 			-- Parse each effect label
 			local sLabel = DB.getValue(v, "label", "");
-			local bTargeted = EffectManager.isTargetedEffect(v);
 			local aEffectComps = EffectManager.parseEffect(sLabel);
 
 			-- Iterate through each effect component looking for a type match
-			local nMatch = 0;
-			for kEffectComp, sEffectComp in ipairs(aEffectComps) do
+			for _,sEffectComp in ipairs(aEffectComps) do
 				local rEffectComp = EffectManager5E.parseEffectComp(sEffectComp);
-				-- CHECK FOR FOLLOWON EFFECT TAGS, AND IGNORE THE REST
-				if rEffectComp.type == "AFTER" or rEffectComp.type == "FAIL" then
-					break;
 				
 				-- CHECK CONDITIONALS
-				elseif rEffectComp.type == "IF" then
+				if rEffectComp.type == "IF" then
 					if not EffectManager5E.checkConditional(rActor, v, rEffectComp.remainder, nil, aIgnore) then
 						break;
 					end
@@ -941,19 +935,19 @@ function checkConditionalHelper(rActor, sEffect, rTarget, aIgnore)
 				
 				-- CHECK FOR AN ACTUAL EFFECT MATCH
 				elseif rEffectComp.original:lower() == sEffect then
-					if bTargeted then
+					if EffectManager.isTargetedEffect(v) then
 						if EffectManager.isEffectTarget(v, rTarget) then
-							bReturn = true;
+							return true;
 						end
 					else
-						bReturn = true;
+						return true;
 					end
 				end
 			end
 		end
 	end
 	
-	return bReturn;
+	return false;
 end
 
 -- replace 5E ActionDamage manager_action_damage.lua performRoll() with this
