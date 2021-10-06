@@ -101,7 +101,8 @@ function onAttackAction(draginfo)
 	else
 		ChatManager.Message(Interface.getString("char_message_atkwithnoammo"), true, rActor);
 	end
-	-- end bmos only allowing attacks when ammo is sufficientend
+	-- end bmos only allowing attacks when ammo is sufficient
+end
 
 function onDamageChanged()
 	local nodeWeapon = getDatabaseNode();
