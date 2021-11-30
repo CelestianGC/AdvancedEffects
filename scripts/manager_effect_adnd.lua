@@ -423,7 +423,7 @@ function addNPC(sClass, nodeNPC, sName)
 	end
 	
 	-- Decode traits and actions
-	local rActor = ActorManager.getActor("", nodeNPC);
+	local rActor = ActorManager.resolveActor( nodeNPC);
 	for _,v in pairs(DB.getChildren(nodeEntry, "actions")) do
 		CombatManager2.parseNPCPower(rActor, v, aEffects);
 	end
@@ -492,7 +492,7 @@ function sendEffectRemovedMessage(nodeChar, nodeEffect, sLabel, nDMOnly)
 --Debug.console("manager_effect_adnd.lua","sendEffectRemovedMessage","sUser",sUser);  
   local sCharacterName = DB.getValue(nodeChar, "name", "");
   -- Build output message
-  local msg = ChatManager.createBaseMessage(ActorManager.getActorFromCT(nodeChar),sUser);
+  local msg = ChatManager.createBaseMessage(ActorManager.resolveActor(nodeChar),sUser);
   msg.text = "Advanced Effect ['" .. sLabel .. "'] ";
   msg.text = msg.text .. "removed [from " .. sCharacterName .. "]";
   -- HANDLE APPLIED BY SETTING
@@ -507,7 +507,7 @@ function sendEffectAddedMessage(nodeCT, rNewEffect, sLabel, nDMOnly)
   local sUser = getUserFromNode(nodeCT);
 --Debug.console("manager_effect_adnd.lua","sendEffectAddedMessage","sUser",sUser);  
 	-- Build output message
-	local msg = ChatManager.createBaseMessage(ActorManager.getActorFromCT(nodeCT),sUser);
+	local msg = ChatManager.createBaseMessage(ActorManager.resolveActor(nodeCT),sUser);
 	msg.text = "Advanced Effect ['" .. rNewEffect.sName .. "'] ";
 	msg.text = msg.text .. "-> [to " .. DB.getValue(nodeCT, "name", "") .. "]";
 	if rNewEffect.sSource and rNewEffect.sSource ~= "" then
@@ -647,9 +647,9 @@ function decodeActors(draginfo)
 	
 	for k,v in ipairs(draginfo.getShortcutList()) do
 		if k == 1 then
-			rSource = ActorManager.getActor(v.class, v.recordname);
+			rSource = ActorManager.resolveActor(v.recordname);
 		else
-			local rTarget = ActorManager.getActor(v.class, v.recordname);
+			local rTarget = ActorManager.resolveActor(v.recordname);
 			if rTarget then
 				table.insert(aTargets, rTarget);
 			end

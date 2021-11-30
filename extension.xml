@@ -3,7 +3,7 @@
 
 	<properties>
 		<name>5E - Advanced Effects</name>
-		<version>4.11</version>
+		<version>5.0</version>
 		<loadorder>99</loadorder>
 		<description>
 			<text>Advanced Effects, add effects to pc, npcs and items.</text>
@@ -15,7 +15,7 @@
 		</ruleset>
 	</properties>
 
-	<announcement text="Advanced Effects - 5E v4.11\rby Celestian, 2017-2021" font="emotefont" icon="celestian" />
+	<announcement text="Advanced Effects - 5E v5.0\rby Celestian, 2017-2021" font="emotefont" icon="celestian" />
 	<base>		
 	<icon name="celestian" file="graphics/icons/celestian.png" />
 	
@@ -71,7 +71,7 @@
     <string name="immune">Immunity</string>
     <string name="vuln">Vulnerability</string>
     <string name="susceptiblity">Susceptiblity</string>
-    <string name="misc">Miscellaneous</string>
+    <string name="misc_ae">Miscellaneous</string>
 
     <string name="modifier">Modifier</string>
     <string name="percent_modifier">% Modifier</string>

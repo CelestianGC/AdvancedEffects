@@ -19,7 +19,7 @@ function onAttackAction(draginfo)
 	-- end bmos removing redundant ammo counting
 
 	-- Perform action
-	local rActor = ActorManager.getActor("pc", nodeChar);
+	local rActor = ActorManager.resolveActor( nodeChar);
 
 	-- add itemPath to rActor so that when effects are checked we can 
 	-- make compare against action only effects
@@ -50,7 +50,7 @@ function onDamageAction(draginfo)
 	local rAction = CharWeaponManager.buildDamageAction(nodeChar, nodeWeapon);
 
 	-- Perform damage action
-	local rActor = ActorManager.getActor("pc", nodeChar);
+	local rActor = ActorManager.resolveActor( nodeChar);
 
 	-- add itemPath to rActor so that when effects are checked we can 
 	-- make compare against action only effects

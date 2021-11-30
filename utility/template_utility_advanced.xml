@@ -69,8 +69,8 @@
 		<button_stringcycler>
 			<parameters>
 				<defaultlabelres mergerule="replace">dash</defaultlabelres>
-				<labelsres>save|ability|susceptiblity|misc</labelsres>
-                <values>save|ability|susceptiblity|misc</values>
+				<labelsres>save|ability|susceptiblity|misc_ae</labelsres>
+                <values>save|ability|susceptiblity|misc_ae</values>
 			</parameters>
 		</button_stringcycler>
 	</template>
