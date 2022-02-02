@@ -60,7 +60,7 @@ function update()
     local bSave = (sType == "save");
     local bAbility = (sType == "ability");
     local bSusceptiblity = (sType == "susceptiblity");
-    local bMisc = (sType == "misc");
+    local bMisc = (sType == "misc_ae");
     
     local w = Interface.findWindow("advanced_effect_editor", "");
 --Debug.console("advanced_effects_editor.lua","update","save",save);
