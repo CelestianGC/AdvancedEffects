@@ -2,6 +2,9 @@
 -- Effects on Items, apply to character in CT
 --
 --
+
+local decodeActors_old
+
 -- add the effect if the item is equipped and doesn't exist already
 function onInit()
   if Session.IsHost then
@@ -29,10 +32,11 @@ function onInit()
     DB.addHandler("charsheet.*.inventorylist.*.isidentified", "onUpdate", updateItemEffectsForEdit);
     DB.addHandler("charsheet.*.inventorylist", "onChildDeleted", updateFromDeletedInventory);
   end
-	CombatManager.setCustomAddPC(addPC);
+  CombatManager.setCustomAddPC(addPC);
   CombatManager.setCustomAddNPC(addNPC);
 
   --CoreRPG replacements
+  decodeActors_old = ActionsManager.decodeActors;
   ActionsManager.decodeActors = decodeActors;
   
   -- 5E effects replacements
@@ -556,20 +560,20 @@ function isValidCheckEffect(rActor, nodeEffect)
 		end
 
 		if sItemPath and sItemPath ~= "" then
-			-- if there is a nodeWeapon do some sanity checking
-			if rActor.nodeWeapon then
+			-- if there is an itemPath do some sanity checking
+			if rActor.itemPath then
 				-- here is where we get the node path of the item, not the
 				-- effectslist entry
-				if bActionOnly and (sItemPath == rActor.nodeWeapon) then
+				if bActionOnly and (sItemPath == rActor.itemPath) then
 					bActionItemUsed = true;
 				end
 			end
 
-			-- if there is a nodeAmmo do some sanity checking
-			if AmmunitionManager and rActor.nodeAmmo then
+			-- if there is a ammoPath do some sanity checking
+			if AmmunitionManager and rActor.ammoPath then
 				-- here is where we get the node path of the item, not the
 				-- effectslist entry
-				if bActionOnly and (sItemPath == rActor.nodeAmmo) then
+				if bActionOnly and (sItemPath == rActor.ammoPath) then
 					bActionItemUsed = true;
 				end
 			end
@@ -634,30 +638,20 @@ function evalAbilityHelper(rActor, sEffectAbility)
     return 0;
 end
 
--- replace CoreRPG ActionsManager manager_actions.lua decodeActors() with this
-function decodeActors(draginfo)
-	local rSource = nil;
-	local aTargets = {};
-    
+--	replace CoreRPG ActionsManager manager_actions.lua decodeActors() with this
+function decodeActors(draginfo, ...)
+	local rSource, aTargets = decodeActors_old(draginfo, ...)
+
+	local sItemPath = draginfo.getMetaData("itemPath")
+	if (sItemPath and sItemPath ~= "") then
+		rSource.itemPath = sItemPath
+	end
 	
-	for k,v in ipairs(draginfo.getShortcutList()) do
-		if k == 1 then
-			rSource = ActorManager.resolveActor(v.recordname);
-		else
-			local rTarget = ActorManager.resolveActor(v.recordname);
-			if rTarget then
-				table.insert(aTargets, rTarget);
-			end
-		end
+	local sAmmoPath = draginfo.getMetaData("ammoPath")
+	if AmmunitionManager and (sAmmoPath and sAmmoPath ~= "") then
+		rSource.ammoPath = sAmmoPath
 	end
 
-    -- itemPath data filled if itemPath if exists
-    local sItemPath = draginfo.getMetaData("itemPath");
-    if (sItemPath and sItemPath ~= "") then
-        rSource.itemPath = sItemPath;
-    end
-    --
-    
 	return rSource, aTargets;
 end
 
@@ -982,6 +976,15 @@ function manager_power_performAction(draginfo, rActor, rAction, nodePower)
     local nodeWeapon = nodePower.getChild("...");
     local _, sRecord = DB.getValue(nodeWeapon, "shortcut", "", "");
 	rActor.itemPath = sRecord;
+
+	-- bmos adding AmmunitionManager integration
+	if AmmunitionManager then
+		local nodeAmmo = AmmunitionManager.getAmmoNode(nodeWeapon, rActor)
+		if nodeAmmo then
+			rActor.ammoPath = nodeAmmo.getPath()
+		end
+	end
+ 
     if (draginfo and rActor.itemPath and rActor.itemPath ~= "") then
         draginfo.setMetaData("itemPath",rActor.itemPath);
     end
