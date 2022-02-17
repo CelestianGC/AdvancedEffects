@@ -983,6 +983,9 @@ function manager_power_performAction(draginfo, rActor, rAction, nodePower)
 		if nodeAmmo then
 			rActor.ammoPath = nodeAmmo.getPath()
 		end
+		if (draginfo and rActor.ammoPath and rActor.ammoPath ~= "") then
+			draginfo.setMetaData("ammoPath", rActor.ammoPath);
+		end
 	end
  
     if (draginfo and rActor.itemPath and rActor.itemPath ~= "") then
