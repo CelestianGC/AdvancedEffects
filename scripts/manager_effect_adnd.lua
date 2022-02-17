@@ -947,7 +947,10 @@ function manager_action_damage_performRoll(draginfo, rActor, rAction)
     if (draginfo and rActor.itemPath and rActor.itemPath ~= "") then
         draginfo.setMetaData("itemPath",rActor.itemPath);
     end
-	
+	if AmmunitionManager and (draginfo and rActor.ammoPath and rActor.ammoPath ~= "") then
+		draginfo.setMetaData("ammoPath", rActor.ammoPath);
+	end
+
 	ActionsManager.performAction(draginfo, rActor, rRoll);
 end
 
@@ -959,7 +962,10 @@ function manager_action_attack_performRoll(draginfo, rActor, rAction)
     if (draginfo and rActor.itemPath and rActor.itemPath ~= "") then
         draginfo.setMetaData("itemPath",rActor.itemPath);
     end
-    
+	if AmmunitionManager and (draginfo and rActor.ammoPath and rActor.ammoPath ~= "") then
+		draginfo.setMetaData("ammoPath", rActor.ammoPath);
+	end
+
 	ActionsManager.performAction(draginfo, rActor, rRoll);
 end
 

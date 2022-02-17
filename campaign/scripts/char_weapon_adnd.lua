@@ -27,6 +27,13 @@ function onAttackAction(draginfo)
 	rActor.itemPath = sRecord;
 	-- end Adanced Effects Piece ---
 
+	-- bmos adding AmmunitionManager integration
+	if AmmunitionManager then
+		local nodeAmmo = AmmunitionManager.getAmmoNode(nodeWeapon, rActor)
+		if nodeAmmo then
+			rActor.ammoPath = nodeAmmo.getPath()
+		end
+	end
 	-- bmos only allowing attacks when ammo is sufficient
 	-- for compatibility with ammunition tracker, make this change in your char_weapon.lua
 	-- this if section replaces the two commented out lines above:
