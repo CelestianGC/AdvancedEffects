@@ -11,15 +11,10 @@ function onAttackAction(draginfo)
 	local rAction = CharWeaponManager.buildAttackAction(nodeChar, nodeWeapon);
 
 	-- Decrement ammo
-	-- bmos removing redundant ammo counting
-	-- for compatibility with ammunition tracker, make this change in your char_weapon.lua
-	if not AmmunitionManager then
-		CharWeaponManager.decrementAmmo(nodeChar, nodeWeapon);
-	end
-	-- end bmos removing redundant ammo counting
+	CharWeaponManager.decrementAmmo(nodeChar, nodeWeapon);
 
 	-- Perform action
-	local rActor = ActorManager.resolveActor( nodeChar);
+	local rActor = ActorManager.resolveActor(nodeChar);
 
 	-- add itemPath to rActor so that when effects are checked we can 
 	-- make compare against action only effects
@@ -27,19 +22,36 @@ function onAttackAction(draginfo)
 	rActor.itemPath = sRecord;
 	-- end Adanced Effects Piece ---
 
-	-- bmos only allowing attacks when ammo is sufficient
-	-- for compatibility with ammunition tracker, make this change in your char_weapon.lua
-	-- this if section replaces the two commented out lines above:
-	-- "ActionAttack.performRoll(draginfo, rActor, rAction);" and "return true;"
-	local nMaxAmmo = DB.getValue(nodeWeapon, 'maxammo', 0)
-	local nMaxAttacks = nMaxAmmo - DB.getValue(nodeWeapon, 'ammo', 0)
-	if not AmmunitionManager or (not (nMaxAmmo > 0) or (nMaxAttacks >= 1)) then	
+	-- bmos adding AmmunitionManager integration
+	if AmmunitionManager then
+		local nodeAmmo = AmmunitionManager.getAmmoNode(nodeWeapon, rActor)
+		if nodeAmmo then
+			rActor.ammoPath = nodeAmmo.getPath()
+		end
+	end
+	--end bmos adding ammoPath
+
+	-- bmos adding AmmoManager loading weapon support and checking for ammo
+	if not AmmunitionManager then	
 		ActionAttack.performRoll(draginfo, rActor, rAction);
 		return true;
 	else
-		ChatManager.Message(Interface.getString("char_message_atkwithnoammo"), true, rActor);
+		local bLoading = DB.getValue(nodeWeapon, 'properties', ''):lower():find('loading') ~= nil
+		local bIsLoaded = DB.getValue(nodeWeapon, 'isloaded', 0) == 1
+		if not bLoading or (bLoading and bIsLoaded) then
+			if (bInfiniteAmmo or nAmmo > 0) then	
+				if bLoading then DB.setValue(nodeWeapon, 'isloaded', 'number', 0); end
+				ActionAttack.performRoll(draginfo, rActor, rAction);
+				return true;
+			else
+				ChatManager.Message(Interface.getString("char_message_atkwithnoammo"), true, rActor);
+				if bLoading then DB.setValue(nodeWeapon, 'isloaded', 'number', 0); end
+			end
+		else
+			ChatManager.Message(string.format(Interface.getString('char_actions_notloaded'), DB.getValue(nodeWeapon, 'name', 'weapon')), true, rActor);
+		end
 	end
-	-- end bmos only allowing attacks when ammo is sufficient
+	-- end bmos adding loading weapon and ammo check support
 end
 
 function onDamageAction(draginfo)
@@ -50,13 +62,22 @@ function onDamageAction(draginfo)
 	local rAction = CharWeaponManager.buildDamageAction(nodeChar, nodeWeapon);
 
 	-- Perform damage action
-	local rActor = ActorManager.resolveActor( nodeChar);
+	local rActor = ActorManager.resolveActor(nodeChar);
 
 	-- add itemPath to rActor so that when effects are checked we can 
 	-- make compare against action only effects
 	local _, sRecord = DB.getValue(nodeWeapon, "shortcut", "", "");
 	rActor.itemPath = sRecord;
 	-- end Adanced Effects Piece ---
+
+	-- bmos adding AmmunitionManager integration
+	if AmmunitionManager then
+		local nodeAmmo = AmmunitionManager.getAmmoNode(nodeWeapon, rActor)
+		if nodeAmmo then
+			rActor.ammoPath = nodeAmmo.getPath()
+		end
+	end
+	-- end bmos adding ammoPath
 	
 	ActionDamage.performRoll(draginfo, rActor, rAction);
 	return true;
