@@ -2,6 +2,9 @@
 -- Effects on Items, apply to character in CT
 --
 --
+
+local decodeActors_old
+
 -- add the effect if the item is equipped and doesn't exist already
 function onInit()
   if Session.IsHost then
@@ -29,10 +32,11 @@ function onInit()
     DB.addHandler("charsheet.*.inventorylist.*.isidentified", "onUpdate", updateItemEffectsForEdit);
     DB.addHandler("charsheet.*.inventorylist", "onChildDeleted", updateFromDeletedInventory);
   end
-	CombatManager.setCustomAddPC(addPC);
+  CombatManager.setCustomAddPC(addPC);
   CombatManager.setCustomAddNPC(addNPC);
 
   --CoreRPG replacements
+  decodeActors_old = ActionsManager.decodeActors;
   ActionsManager.decodeActors = decodeActors;
   
   -- 5E effects replacements
@@ -537,55 +541,50 @@ function sendRawMessage(sUser, nDMOnly, msg)
   end
 end
 
+---	This function returns false if the effect is tied to an item and the item is not being used.
+function isValidCheckEffect(rActor, nodeEffect)
+	if DB.getValue(nodeEffect, "isactive", 0) ~= 0 then
+		local bItem, bActionItemUsed, bActionOnly = false, false, false
+		local sItemPath = ""
 
--- pass effect to here to see if the effect is being triggered
--- by an item and if so if it's valid
-function isValidCheckEffect(rActor,nodeEffect)
-    local bResult = false;
-    local nActive = DB.getValue(nodeEffect, "isactive", 0);
-    local bItem = false;
-    local bActionItemUsed = false;
-    local bActionOnly = false;
-    local nodeItem = nil;
+		local sSource = DB.getValue(nodeEffect,"source_name","");
+		-- if source is a valid node and we can find "actiononly"
+		-- setting then we set it.
+		local node = DB.findNode(sSource);
+		if node then
+			local nodeItem = node.getChild("...");
+			if nodeItem then
+				sItemPath = nodeItem.getPath();
+				bActionOnly = (DB.getValue(node,"actiononly",0) ~= 0);
+			end
+		end
 
-    local sSource = DB.getValue(nodeEffect,"source_name","");
-    -- if source is a valid node and we can find "actiononly"
-    -- setting then we set it.
-    local node = DB.findNode(sSource);
-    if (node and node ~= nil) then
-        nodeItem = node.getChild("...");
-        if nodeItem and nodeItem ~= nil then
-            bActionOnly = (DB.getValue(node,"actiononly",0) ~= 0);
-        end
-    end
+		if sItemPath and sItemPath ~= "" then
+			-- if there is an itemPath do some sanity checking
+			if rActor.itemPath then
+				-- here is where we get the node path of the item, not the
+				-- effectslist entry
+				if bActionOnly and (sItemPath == rActor.itemPath) then
+					bActionItemUsed = true;
+				end
+			end
 
-    -- if there is a itemPath do some sanity checking
-    if (rActor.itemPath and rActor.itemPath ~= "") then 
-        -- here is where we get the node path of the item, not the 
-        -- effectslist entry
-        if ((DB.findNode(rActor.itemPath) ~= nil)) then
-            if (node and node ~= nil and nodeItem and nodeItem ) then
-                local sNodePath = nodeItem.getPath();
-                if bActionOnly and sNodePath ~= "" and (sNodePath == rActor.itemPath) then
-                    bActionItemUsed = true;
-                    bItem = true;
-                else
-                    bActionItemUsed = false;
-                    bItem = true; -- is item but doesn't match source path for this effect
-                end
-            end
-        end
-    end
-    if nActive ~= 0 and bActionOnly and bActionItemUsed then
-        bResult = true;
-    elseif nActive ~= 0 and not bActionOnly and bActionItemUsed then
-        bResult = true;
-    elseif nActive ~= 0 and bActionOnly and not bActionItemUsed then
-        bResult = false;
-    elseif nActive ~= 0 then
-        bResult = true;
-    end
-    return bResult;
+			-- if there is a ammoPath do some sanity checking
+			if AmmunitionManager and rActor.ammoPath then
+				-- here is where we get the node path of the item, not the
+				-- effectslist entry
+				if bActionOnly and (sItemPath == rActor.ammoPath) then
+					bActionItemUsed = true;
+				end
+			end
+		end
+		
+		if bActionOnly and not bActionItemUsed then
+			return false;
+		else
+			return true;
+		end
+	end
 end
 
 
@@ -639,30 +638,20 @@ function evalAbilityHelper(rActor, sEffectAbility)
     return 0;
 end
 
--- replace CoreRPG ActionsManager manager_actions.lua decodeActors() with this
-function decodeActors(draginfo)
-	local rSource = nil;
-	local aTargets = {};
-    
+--	replace CoreRPG ActionsManager manager_actions.lua decodeActors() with this
+function decodeActors(draginfo, ...)
+	local rSource, aTargets = decodeActors_old(draginfo, ...)
+
+	local sItemPath = draginfo.getMetaData("itemPath")
+	if (sItemPath and sItemPath ~= "") then
+		rSource.itemPath = sItemPath
+	end
 	
-	for k,v in ipairs(draginfo.getShortcutList()) do
-		if k == 1 then
-			rSource = ActorManager.resolveActor(v.recordname);
-		else
-			local rTarget = ActorManager.resolveActor(v.recordname);
-			if rTarget then
-				table.insert(aTargets, rTarget);
-			end
-		end
+	local sAmmoPath = draginfo.getMetaData("ammoPath")
+	if AmmunitionManager and (sAmmoPath and sAmmoPath ~= "") then
+		rSource.ammoPath = sAmmoPath
 	end
 
-    -- itemPath data filled if itemPath if exists
-    local sItemPath = draginfo.getMetaData("itemPath");
-    if (sItemPath and sItemPath ~= "") then
-        rSource.itemPath = sItemPath;
-    end
-    --
-    
 	return rSource, aTargets;
 end
 
@@ -958,7 +947,10 @@ function manager_action_damage_performRoll(draginfo, rActor, rAction)
     if (draginfo and rActor.itemPath and rActor.itemPath ~= "") then
         draginfo.setMetaData("itemPath",rActor.itemPath);
     end
-	
+	if AmmunitionManager and (draginfo and rActor.ammoPath and rActor.ammoPath ~= "") then
+		draginfo.setMetaData("ammoPath", rActor.ammoPath);
+	end
+
 	ActionsManager.performAction(draginfo, rActor, rRoll);
 end
 
@@ -970,7 +962,10 @@ function manager_action_attack_performRoll(draginfo, rActor, rAction)
     if (draginfo and rActor.itemPath and rActor.itemPath ~= "") then
         draginfo.setMetaData("itemPath",rActor.itemPath);
     end
-    
+	if AmmunitionManager and (draginfo and rActor.ammoPath and rActor.ammoPath ~= "") then
+		draginfo.setMetaData("ammoPath", rActor.ammoPath);
+	end
+
 	ActionsManager.performAction(draginfo, rActor, rRoll);
 end
 
@@ -987,6 +982,18 @@ function manager_power_performAction(draginfo, rActor, rAction, nodePower)
     local nodeWeapon = nodePower.getChild("...");
     local _, sRecord = DB.getValue(nodeWeapon, "shortcut", "", "");
 	rActor.itemPath = sRecord;
+
+	-- bmos adding AmmunitionManager integration
+	if AmmunitionManager then
+		local nodeAmmo = AmmunitionManager.getAmmoNode(nodeWeapon, rActor)
+		if nodeAmmo then
+			rActor.ammoPath = nodeAmmo.getPath()
+		end
+		if (draginfo and rActor.ammoPath and rActor.ammoPath ~= "") then
+			draginfo.setMetaData("ammoPath", rActor.ammoPath);
+		end
+	end
+ 
     if (draginfo and rActor.itemPath and rActor.itemPath ~= "") then
         draginfo.setMetaData("itemPath",rActor.itemPath);
     end
