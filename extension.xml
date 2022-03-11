@@ -1,99 +1,99 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
-<root version="3.0" >
+<root version="3.0">
 
-	<properties>
-		<name>5E - Advanced Effects</name>
-		<version>5.1</version>
-		<loadorder>99</loadorder>
-		<description>
-			<text>Advanced Effects, add effects to pc, npcs and items.</text>
-			<website></website>
-			<author>Celestian</author>
-		</description>
-		<ruleset>
-          <name>5E</name>
-		</ruleset>
-	</properties>
+    <properties>
+        <name>5E - Advanced Effects</name>
+        <version>5.2</version>
+        <loadorder>99</loadorder>
+        <description>
+            <text>Advanced Effects, add effects to pc, npcs and items.</text>
+            <website></website>
+            <author>Celestian</author>
+        </description>
+        <ruleset>
+            <name>5E</name>
+        </ruleset>
+    </properties>
 
-	<announcement text="Advanced Effects - 5E v5.1\rby Celestian, 2017-2021" font="emotefont" icon="celestian" />
-	<base>		
-	<icon name="celestian" file="graphics/icons/celestian.png" />
-	
-    <script name="EffectManagerADND" file="scripts/manager_effect_adnd.lua" />
+    <announcement text="Advanced Effects - 5E v5.2\rby Celestian, 2017-2021" font="emotefont" icon="celestian" />
+    <base>
+        <icon name="celestian" file="graphics/icons/celestian.png" />
 
-    <string name="header_effects">Effect Features</string>
-    <string name="item_label_effectfeature">Effect</string>
-    <string name="item_label_effect_visible">Visibility</string>
-    <string name="item_label_effect_visible_tooltip">Always SHOW or HIDE the effect. Default mode shows if item is identified or hides if not.</string>
-    <string name="item_label_effects_hide">Hide</string>
-    <string name="item_label_effects_show">Show</string>
-    
-    <string name="item_label_effects_dice">Dice</string>
-    <string name="item_effects_dice_tooltip">Dice rolled for duration of effect.</string>
-    <string name="item_label_effects_mod_tooltip">Modifier applied to duration or do not use dice and set for static duration.</string>
-    <string name="item_label_effects_unit">Unit</string>
-    <string name="item_label_effects_unit_tooltip">Time unit, round, minute, hour or day.</string>
-    <string name="item_label_effects_string_tooltip">Effect string. i.e. "STR: +1;SAVE -1;"</string>
-    <string name="item_label_effect_tooltip">Effects that are applied with the item is equipped and the character is in the combat tracker.</string>
-    
-    <string name="item_label_effectfeature">Effect</string>
-    <string name="item_label_ability_type">Type</string>
-    <string name="item_ability_type_tooltip">MODIFIER, PERCENT MODIFIER, BASE VALUE or BASE PERCENT value of an ability score.</string>
-    <string name="item_label_ability_name">Ability</string>
-    <string name="item_label_ability_value">Value</string>
+        <script name="EffectManagerADND" file="scripts/manager_effect_adnd.lua" />
 
-    <string name="effect_label_misc_type_tooltip">The type of effect you wish to apply.</string>
-    <string name="effect_label_misc_value_tooltip">Value to be applied to the type of effect.</string>
+        <string name="header_effects">Effect Features</string>
+        <string name="item_label_effectfeature">Effect</string>
+        <string name="item_label_effect_visible">Visibility</string>
+        <string name="item_label_effect_visible_tooltip">Always SHOW or HIDE the effect. Default mode shows if item is identified or hides if not.</string>
+        <string name="item_label_effects_hide">Hide</string>
+        <string name="item_label_effects_show">Show</string>
 
-    <string name="power_label_type">Type</string>
-    <string name="power_label_type_tooltip">Type of effect. Use CUSTOM to set the string manually.</string>
+        <string name="item_label_effects_dice">Dice</string>
+        <string name="item_effects_dice_tooltip">Dice rolled for duration of effect.</string>
+        <string name="item_label_effects_mod_tooltip">Modifier applied to duration or do not use dice and set for static duration.</string>
+        <string name="item_label_effects_unit">Unit</string>
+        <string name="item_label_effects_unit_tooltip">Time unit, round, minute, hour or day.</string>
+        <string name="item_label_effects_string_tooltip">Effect string. i.e. "STR: +1;SAVE -1;"</string>
+        <string name="item_label_effect_tooltip">Effects that are applied with the item is equipped and the character is in the combat tracker.</string>
 
-    <string name="char_abilities_label_advancedeffects">ADVANCED EFFECTS</string>
+        <string name="item_label_effectfeature">Effect</string>
+        <string name="item_label_ability_type">Type</string>
+        <string name="item_ability_type_tooltip">MODIFIER, PERCENT MODIFIER, BASE VALUE or BASE PERCENT value of an ability score.</string>
+        <string name="item_label_ability_name">Ability</string>
+        <string name="item_label_ability_value">Value</string>
 
-    <string name="header_saves">Save Features</string>
-    <string name="item_save_type_tooltip">Modifier of a save score. Base value of a save score.</string>
-    <string name="item_label_save_type">Type</string>
-    <string name="item_label_save_type_tooltip">The type of save to be used.</string>
-    <string name="item_label_save_name">Save</string>
-    <string name="item_label_save_name_tooltip">Save</string>
-    <string name="item_label_save_value">Value</string>
-    <string name="item_label_save_value_tooltip">Value of the modifier.</string>
-    <string name="item_label_savefeature">Feature</string>
-    <string name="item_label_effect_attackonly">ActionOnly</string>
-    <string name="item_label_effect_attackonly_tooltip">Check this so effect ONLY applied during an attack or damage.</string>
-    
-    <string name="text_MOD">MOD</string>
-    <string name="custom">Custom</string>
-    <string name="save">Save</string>
-    <string name="ability">Ability</string>
-    <string name="resist">Resistance</string>
-    <string name="resistant">Resistant</string>
-    <string name="immune">Immunity</string>
-    <string name="vuln">Vulnerability</string>
-    <string name="susceptiblity">Susceptiblity</string>
-    <string name="misc_ae">Miscellaneous</string>
+        <string name="effect_label_misc_type_tooltip">The type of effect you wish to apply.</string>
+        <string name="effect_label_misc_value_tooltip">Value to be applied to the type of effect.</string>
 
-    <string name="modifier">Modifier</string>
-    <string name="percent_modifier">% Modifier</string>
-    <string name="base">Base</string>
-    <string name="base_percent">Base %</string>
+        <string name="power_label_type">Type</string>
+        <string name="power_label_type_tooltip">Type of effect. Use CUSTOM to set the string manually.</string>
 
-    <string name="ac">AC</string>
-    <string name="bac">Base AC</string>
-    <string name="atk">Attack</string>
-    <string name="check">Check</string>
-    <string name="dmg">Damage</string>
-    <string name="heal">Heal</string>
-    <string name="init_ae">Initiative</string>
-    <string name="save">Save</string>
+        <string name="char_abilities_label_advancedeffects">ADVANCED EFFECTS</string>
 
-    <string name="option_label_ADND_AE_EDIT">PC: Adv. Effect Edit</string>
-    <string name="option_label_ADND_AE_enabled">Enabled</string>
-    <string name="option_label_ADND_AE_disabled">Disabled</string>
-    
-    <includefile source="utility/template_utility_advanced.xml" />
-    <includefile source="utility/utility_effects_advanced.xml" />
-    <includefile source="advanced_effects.xml" /> 
+        <string name="header_saves">Save Features</string>
+        <string name="item_save_type_tooltip">Modifier of a save score. Base value of a save score.</string>
+        <string name="item_label_save_type">Type</string>
+        <string name="item_label_save_type_tooltip">The type of save to be used.</string>
+        <string name="item_label_save_name">Save</string>
+        <string name="item_label_save_name_tooltip">Save</string>
+        <string name="item_label_save_value">Value</string>
+        <string name="item_label_save_value_tooltip">Value of the modifier.</string>
+        <string name="item_label_savefeature">Feature</string>
+        <string name="item_label_effect_attackonly">ActionOnly</string>
+        <string name="item_label_effect_attackonly_tooltip">Check this so effect ONLY applied during an attack or damage.</string>
+
+        <string name="text_MOD">MOD</string>
+        <string name="custom">Custom</string>
+        <string name="save">Save</string>
+        <string name="ability">Ability</string>
+        <string name="resist">Resistance</string>
+        <string name="resistant">Resistant</string>
+        <string name="immune">Immunity</string>
+        <string name="vuln">Vulnerability</string>
+        <string name="susceptiblity">Susceptiblity</string>
+        <string name="misc_ae">Miscellaneous</string>
+
+        <string name="modifier">Modifier</string>
+        <string name="percent_modifier">% Modifier</string>
+        <string name="base">Base</string>
+        <string name="base_percent">Base %</string>
+
+        <string name="ac">AC</string>
+        <string name="bac">Base AC</string>
+        <string name="atk">Attack</string>
+        <string name="check">Check</string>
+        <string name="dmg">Damage</string>
+        <string name="heal">Heal</string>
+        <string name="init_ae">Initiative</string>
+        <string name="save">Save</string>
+
+        <string name="option_label_ADND_AE_EDIT">PC: Adv. Effect Edit</string>
+        <string name="option_label_ADND_AE_enabled">Enabled</string>
+        <string name="option_label_ADND_AE_disabled">Disabled</string>
+
+        <includefile source="utility/template_utility_advanced.xml" />
+        <includefile source="utility/utility_effects_advanced.xml" />
+        <includefile source="advanced_effects.xml" />
     </base>
-    
+
 </root>
