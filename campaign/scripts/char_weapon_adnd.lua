@@ -39,6 +39,7 @@ function onAttackAction(draginfo)
 		local bLoading = DB.getValue(nodeWeapon, 'properties', ''):lower():find('loading') ~= nil
 		local bIsLoaded = DB.getValue(nodeWeapon, 'isloaded', 0) == 1
 		if not bLoading or (bLoading and bIsLoaded) then
+			local nAmmo, bInfiniteAmmo = AmmunitionManager.getAmmoRemaining(rActor, nodeWeapon, AmmunitionManager.getAmmoNode(nodeWeapon))
 			if (bInfiniteAmmo or nAmmo > 0) then	
 				if bLoading then DB.setValue(nodeWeapon, 'isloaded', 'number', 0); end
 				ActionAttack.performRoll(draginfo, rActor, rAction);
