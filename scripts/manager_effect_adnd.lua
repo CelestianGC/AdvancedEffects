@@ -966,12 +966,10 @@ function addAbilityEffects(nodeChar)
 	if not nodeEntry then
 		return;
 	end
-
 	local nodeList = nodeChar.createChild("effectlist");
 	if not nodeList then
 		return;
 	end
-
 	for _,nodeSourceEffect in pairs(DB.getChildren(nodeSource, "effectlist")) do
 		local nodeCharEffect = nodeList.createChild();
 		DB.copyNode(nodeSourceEffect, nodeCharEffect);
