@@ -37,7 +37,109 @@
             <!-- end advanced effects entry -->
         </sheetdata>
 	</windowclass>
-    
+
+	<windowclass name="ref_classfeature_stats" merge="join">
+		<sheetdata>
+			<!-- effects -->
+			<subwindow name="advanced_effects_contents" insertbefore="text">
+				<anchored>
+					<top parent="columnanchor" anchor="bottom" relation="relative" offset="0" />
+					<left offset="5" />
+					<right offset="5" />
+				</anchored>
+				<class>advanced_effects_subwindow</class>
+				<activate />
+				<fastinit />
+				<invisible />
+			</subwindow>
+			<!-- end advanced effects entry -->
+		</sheetdata>
+	</windowclass>
+
+	<windowclass name="reference_feat" merge="join">
+		<script>
+			function onInit()
+				if super and super.onInit then
+					super.onInit()
+				end
+				text.setAnchor("top", "contentframe", "top", "absolute", 65);
+			end
+		</script>
+		<sheetdata>
+			<subwindow name="advanced_effects_contents" insertbefore="text">
+				<anchored to="contentframe" height="60">
+					<left />
+					<top />
+					<right />
+				</anchored>
+				<class>advanced_effects_subwindow</class>
+				<activate />
+				<fastinit />
+				<invisible />
+			</subwindow>
+			<scrollbar>
+				<anchored to="advanced_effects_contents" />
+				<target>advanced_effects_contents</target>
+			</scrollbar>
+		</sheetdata>
+	</windowclass>
+
+	<windowclass name="reference_racialtrait" merge="join">
+		<script>
+			function onInit()
+				if super and super.onInit then
+					super.onInit()
+				end
+				text.setAnchor("top", "contentframe", "top", "absolute", 65);
+			end
+		</script>
+		<sheetdata>
+			<subwindow name="advanced_effects_contents" insertbefore="text">
+				<anchored to="contentframe" height="60">
+					<left />
+					<top />
+					<right />
+				</anchored>
+				<class>advanced_effects_subwindow</class>
+				<activate />
+				<fastinit />
+				<invisible />
+			</subwindow>
+			<scrollbar>
+				<anchored to="advanced_effects_contents" />
+				<target>advanced_effects_contents</target>
+			</scrollbar>
+		</sheetdata>
+	</windowclass>
+
+	<windowclass name="reference_subracialtrait" merge="join">
+		<script>
+			function onInit()
+				if super and super.onInit then
+					super.onInit()
+				end
+				text.setAnchor("top", "contentframe", "top", "absolute", 65);
+			end
+		</script>
+		<sheetdata>
+			<subwindow name="advanced_effects_contents" insertbefore="text">
+				<anchored to="contentframe" height="60">
+					<left />
+					<top />
+					<right />
+				</anchored>
+				<class>advanced_effects_subwindow</class>
+				<activate />
+				<fastinit />
+				<invisible />
+			</subwindow>
+			<scrollbar>
+				<anchored to="advanced_effects_contents" />
+				<target>advanced_effects_contents</target>
+			</scrollbar>
+		</sheetdata>
+	</windowclass>
+
     <!-- advanced effects subwindow -->
     <windowclass name="advanced_effects_subwindow">
 		<margins control="0,0,2,2" />

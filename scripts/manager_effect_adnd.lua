@@ -2,7 +2,9 @@
 -- Effects on Items, apply to character in CT
 --
 --
-
+local addClassFeatureDB_old;
+local addFeatDB_old;
+local addTraitDB_old;
 local decodeActors_old;
 
 -- add the effect if the item is equipped and doesn't exist already
@@ -51,6 +53,12 @@ function onInit()
   -- used for 5E extension ONLY
   ActionAttack.performRoll = manager_action_attack_performRoll;
   ActionDamage.performRoll = manager_action_damage_performRoll;
+  addClassFeatureDB_old = CharManager.addClassFeatureDB;
+  CharManager.addClassFeatureDB = addClassFeatureDB;
+  addFeatDB_old = CharManager.addFeatDB;
+  CharManager.addFeatDB = addFeatDB;
+  addTraitDB_old = CharManager.addTraitDB;
+  CharManager.addTraitDB = addTraitDB;
   PowerManager.performAction = manager_power_performAction;
 
     -- option in house rule section, enable/disable allow PCs to edit advanced effects.
@@ -911,4 +919,55 @@ function manager_power_performAction(draginfo, rActor, rAction, nodePower)
 		ActionsManager.performMultiAction(draginfo, rActor, rRolls[1].sType, rRolls);
 	end
 	return true;
+end
+
+-- replace 5E CharManager manager_char.lua addClassFeatureDB() with this
+function addClassFeatureDB(nodeChar, sClass, sRecord, nodeClass, bWizard)
+	local result = addClassFeatureDB_old(nodeChar, sClass, sRecord, nodeClass, bWizard);
+	if result then
+		addAbilityEffects(nodeChar, sRecord);
+	end
+	return result;
+end
+
+-- replace 5E CharManager manager_char.lua addFeatDB() with this
+function addFeatDB(nodeChar, sClass, sRecord, bWizard)
+	local result = addFeatDB_old(nodeChar, sClass, sRecord, bWizard);
+	if result then
+		addAbilityEffects(nodeChar, sRecord);
+	end
+	return result;
+end
+
+-- replace 5E CharManager manager_char.lua addTraitDB() with this
+function addTraitDB(nodeChar, sClass, sRecord)
+	local result = addTraitDB_old(nodeChar, sClass, sRecord);
+	if result then
+		addAbilityEffects(nodeChar, sRecord);
+	end
+	return result;
+end
+
+-- Common logic for adding effects from abilities to the character upon gaining the ability.
+function addAbilityEffects(nodeChar, sRecord)
+	local nodeSource = CharManager.resolveRefNode(sRecord);
+	if not nodeSource then
+		return;
+	end
+
+	local nodeEntry = ActorManager.getCTNode(nodeChar);
+	if not nodeEntry then
+		return;
+	end
+	
+	local nodeList = nodeChar.createChild("effectlist");
+	if not nodeList then
+		return;
+	end
+	
+	for _,nodeSourceEffect in pairs(DB.getChildren(nodeSource, "effectlist")) do
+		local nodeCharEffect = nodeList.createChild();
+		DB.copyNode(nodeSourceEffect, nodeCharEffect);
+		updateCharEffect(nodeCharEffect,nodeEntry);
+	end
 end
