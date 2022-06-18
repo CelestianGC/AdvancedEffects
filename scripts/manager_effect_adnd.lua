@@ -2,10 +2,11 @@
 -- Effects on Items, apply to character in CT
 --
 --
-local addClassFeatureDB_old;
-local addFeatDB_old;
-local addTraitDB_old;
+local addClassFeature_old;
+local addFeat_old;
+local addRaceTrait_old;
 local decodeActors_old;
+local helperBuildAddStructure_old;
 
 -- add the effect if the item is equipped and doesn't exist already
 function onInit()
@@ -53,12 +54,14 @@ function onInit()
   -- used for 5E extension ONLY
   ActionAttack.performRoll = manager_action_attack_performRoll;
   ActionDamage.performRoll = manager_action_damage_performRoll;
-  addClassFeatureDB_old = CharManager.addClassFeatureDB;
-  CharManager.addClassFeatureDB = addClassFeatureDB;
-  addFeatDB_old = CharManager.addFeatDB;
-  CharManager.addFeatDB = addFeatDB;
-  addTraitDB_old = CharManager.addTraitDB;
-  CharManager.addTraitDB = addTraitDB;
+  addClassFeature_old = CharClassManager.addClassFeature;
+  CharClassManager.addClassFeature = addClassFeature;
+  addFeat_old = CharFeatManager.addFeat;
+  CharFeatManager.addFeat = addFeat;
+  addRaceTrait_old = CharRaceManager.addRaceTrait;
+  CharRaceManager.addRaceTrait = addRaceTrait;
+  helperBuildAddStructure_old = CharManager.helperBuildAddStructure;
+  CharManager.helperBuildAddStructure = helperBuildAddStructure;
   PowerManager.performAction = manager_power_performAction;
 
     -- option in house rule section, enable/disable allow PCs to edit advanced effects.
@@ -921,36 +924,40 @@ function manager_power_performAction(draginfo, rActor, rAction, nodePower)
 	return true;
 end
 
--- replace 5E CharManager manager_char.lua addClassFeatureDB() with this
-function addClassFeatureDB(nodeChar, sClass, sRecord, nodeClass, bWizard)
-	local result = addClassFeatureDB_old(nodeChar, sClass, sRecord, nodeClass, bWizard);
-	if result then
-		addAbilityEffects(nodeChar, sRecord);
-	end
-	return result;
+local rAdd;
+-- replace 5E CharManager manager_char.lua helperBuildAddStructure() with this
+function helperBuildAddStructure(nodeChar, sClass, sRecord, bWizard)
+	rAdd = helperBuildAddStructure_old(nodeChar, sClass, sRecord, bWizard);
+	return rAdd;
 end
 
--- replace 5E CharManager manager_char.lua addFeatDB() with this
-function addFeatDB(nodeChar, sClass, sRecord, bWizard)
-	local result = addFeatDB_old(nodeChar, sClass, sRecord, bWizard);
-	if result then
+-- replace 5E CharClassManager manager_char_class.lua addClassFeature() with this
+function addClassFeature(nodeChar, sClass, sRecord, nodeClass, bWizard)
+	addClassFeature_old(nodeChar, sClass, sRecord, nodeClass, bWizard);
+	if rAdd then
 		addAbilityEffects(nodeChar, sRecord);
 	end
-	return result;
 end
 
--- replace 5E CharManager manager_char.lua addTraitDB() with this
-function addTraitDB(nodeChar, sClass, sRecord)
-	local result = addTraitDB_old(nodeChar, sClass, sRecord);
-	if result then
+-- replace 5E CharFeatManager manager_char_feat.lua addFeat() with this
+function addFeat(nodeChar, sClass, sRecord, bWizard)
+	addFeat_old(nodeChar, sClass, sRecord, bWizard);
+	if rAdd then
 		addAbilityEffects(nodeChar, sRecord);
 	end
-	return result;
+end
+
+-- replace 5E CharRaceManager manager_char.lua addRaceTrait() with this
+function addRaceTrait(nodeChar, sClass, sRecord, bWizard)
+	addRaceTrait_old(nodeChar, sClass, sRecord, bWizard);
+	if rAdd then
+		addAbilityEffects(nodeChar, sRecord);
+	end
 end
 
 -- Common logic for adding effects from abilities to the character upon gaining the ability.
-function addAbilityEffects(nodeChar, sRecord)
-	local nodeSource = CharManager.resolveRefNode(sRecord);
+function addAbilityEffects(nodeChar)
+	local nodeSource = rAdd.nodeSource;
 	if not nodeSource then
 		return;
 	end
@@ -959,12 +966,10 @@ function addAbilityEffects(nodeChar, sRecord)
 	if not nodeEntry then
 		return;
 	end
-	
 	local nodeList = nodeChar.createChild("effectlist");
 	if not nodeList then
 		return;
 	end
-	
 	for _,nodeSourceEffect in pairs(DB.getChildren(nodeSource, "effectlist")) do
 		local nodeCharEffect = nodeList.createChild();
 		DB.copyNode(nodeSourceEffect, nodeCharEffect);
