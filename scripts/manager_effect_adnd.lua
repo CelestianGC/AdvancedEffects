@@ -962,17 +962,17 @@ function addAbilityEffects(nodeChar)
 		return;
 	end
 
-	local nodeEntry = ActorManager.getCTNode(nodeChar);
-	if not nodeEntry then
-		return;
-	end
 	local nodeList = nodeChar.createChild("effectlist");
 	if not nodeList then
 		return;
 	end
+
+	local nodeEntry = ActorManager.getCTNode(nodeChar);
 	for _,nodeSourceEffect in pairs(DB.getChildren(nodeSource, "effectlist")) do
 		local nodeCharEffect = nodeList.createChild();
 		DB.copyNode(nodeSourceEffect, nodeCharEffect);
-		updateCharEffect(nodeCharEffect,nodeEntry);
+		if nodeEntry then
+			updateCharEffect(nodeCharEffect,nodeEntry);
+		end
 	end
 end
