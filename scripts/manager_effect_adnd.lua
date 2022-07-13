@@ -7,6 +7,7 @@ local addFeat_old;
 local addRaceTrait_old;
 local decodeActors_old;
 local helperBuildAddStructure_old;
+local onNPCPostAdd_old;
 
 -- add the effect if the item is equipped and doesn't exist already
 function onInit()
@@ -36,8 +37,9 @@ function onInit()
     DB.addHandler("charsheet.*.inventorylist", "onChildDeleted", updateFromDeletedInventory);
   end
 
-  CombatManager.setCustomAddPC(addPC);
-  CombatManager.setCustomAddNPC(addNPC);
+  onNPCPostAdd_old = CombatRecordManager.getRecordTypePostAddCallback("npc");
+  CombatRecordManager.setRecordTypePostAddCallback("npc", onNPCPostAdd);
+  CombatRecordManager.setRecordTypePostAddCallback("charsheet", onPCPostAdd);
 
   --CoreRPG replacements
   decodeActors_old = ActionsManager.decodeActors;
@@ -314,49 +316,30 @@ end
 
 -- custom version of the one in CoreRPG to deal with adding new 
 -- pcs to the combat tracker to deal with advanced effects. --celestian
-function addPC(nodePC)
-	-- CoreRPG AddPC
-	-- Create a new combat tracker window
-	local nodeEntry = DB.createChild("combattracker.list");
-	if not nodeEntry then
-		return;
-	end
-
-	-- Set up the CT specific information
-	DB.setValue(nodeEntry, "link", "windowreference", "charsheet", nodePC.getPath());
-	DB.setValue(nodeEntry, "friendfoe", "string", "friend");
-
-	local sToken = DB.getValue(nodePC, "token", nil);
-	if not sToken or sToken == "" then
-		sToken = "portrait_" .. nodePC.getName() .. "_token"
-	end
-	DB.setValue(nodeEntry, "token", "token", sToken);
-	-- END CoreRPG AddPC
-
+function onPCPostAdd(tCustom)
 	-- add this to make the npc show up first time for Situational Awareness
-	DB.setValue(nodeEntry,"ct.visible","number",1);
+	DB.setValue(tCustom.nodeCT,"ct.visible","number",1);
 	--
 
     -- now flip through inventory and pass each to updateEffects()
     -- so that if they have a combat_effect it will be applied.
-    for _,nodeItem in pairs(DB.getChildren(nodePC, "inventorylist")) do
+    for _,nodeItem in pairs(DB.getChildren(tCustom.nodeRecord, "inventorylist")) do
         updateItemEffects(nodeItem,true);
     end
     -- check to see if pc effects exists and if so apply --celestian
-    updateCharEffects(nodePC,nodeEntry);
+    updateCharEffects(tCustom.nodeRecord,tCustom.nodeCT);
 end
 
 -- I call the 5e version of CombatManager2.addNPC directly and then touch up what I need now
 -- added the bit that checks for PC effects to add -- celestian
-function addNPC(sClass, nodeNPC, sName)
-	local nodeEntry = CombatManager2.addNPC(sClass,nodeNPC,sName);
+function onNPCPostAdd(tCustom)
+	onNPCPostAdd_old(tCustom);
 
 	-- add this to make the npc show up first time for Situational Awareness
-	DB.setValue(nodeEntry,"ct.visible","number",1);
+	DB.setValue(tCustom.nodeCT,"ct.visible","number",1);
 
     -- check to see if npc effects exists and if so apply --celestian
-    updateCharEffects(nodeNPC,nodeEntry);
-	return nodeEntry;
+    updateCharEffects(tCustom.nodeRecord,tCustom.nodeCT);
 end
 
 -- get the Connected Player's name that has this identity

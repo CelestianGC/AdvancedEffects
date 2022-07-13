@@ -56,6 +56,24 @@
 		</sheetdata>
 	</windowclass>
 
+	<windowclass name="ref_classfeature_stats_specialization" merge="join">
+		<sheetdata>
+			<!-- effects -->
+			<subwindow name="advanced_effects_contents" insertbefore="text">
+				<anchored>
+					<top parent="columnanchor" anchor="bottom" relation="relative" offset="0" />
+					<left offset="5" />
+					<right offset="5" />
+				</anchored>
+				<class>advanced_effects_subwindow</class>
+				<activate />
+				<fastinit />
+				<invisible />
+			</subwindow>
+			<!-- end advanced effects entry -->
+		</sheetdata>
+	</windowclass>
+
 	<windowclass name="reference_feat" merge="join">
 		<script>
 			function onInit()
