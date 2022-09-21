@@ -1,10 +1,12 @@
--- 
--- Please see the license.html file included with this distribution for 
+--
+-- Please see the license.html file included with this distribution for
 -- attribution and copyright information.
 --
+-- luacheck: globals onAttackAction onDamageAction
 
--- add itemPath to rActor so that when effects are checked we can 
+-- add itemPath to rActor so that when effects are checked we can
 -- make compare against action only effects
+-- luacheck: globals advancedEffectsPiece
 function advancedEffectsPiece(nodeWeapon)
 	local _, sRecord = DB.getValue(nodeWeapon, "shortcut", "", "");
 	return sRecord;
@@ -38,20 +40,21 @@ function onAttackAction(draginfo)
 	--end bmos adding ammoPath
 
 	-- bmos adding AmmoManager loading weapon support and checking for ammo
-	if not AmmunitionManager then	
+	if not AmmunitionManager then
 		ActionAttack.performRoll(draginfo, rActor, rAction);
 		return true;
 	else
 		local nAmmo, bInfiniteAmmo = AmmunitionManager.getAmmoRemaining(rActor, nodeWeapon, AmmunitionManager.getAmmoNode(nodeWeapon));
 		local messagedata = { text = '', sender = rActor.sName, font = "emotefont" };
 
-		local bLoading = isLoading(nodeWeapon);
+		local bLoading = self.isLoading(nodeWeapon);
 		local bIsLoaded = DB.getValue(nodeWeapon, 'isloaded', 0) == 1;
 		if not bLoading or (bLoading and bIsLoaded) then
 			if bLoading then DB.setValue(nodeWeapon, 'isloaded', 'number', 0); end
 
 			if (bInfiniteAmmo or nAmmo > 0) then
-				return onAttackAction_old(draginfo, ...);
+				ActionAttack.performRoll(draginfo, rActor, rAction);
+				return true;
 			else
 				messagedata.text = Interface.getString('char_message_atkwithnoammo');
 				Comm.deliverChatMessage(messagedata);
@@ -88,7 +91,7 @@ function onDamageAction(draginfo)
 		end
 	end
 	-- end bmos adding ammoPath
-	
+
 	ActionDamage.performRoll(draginfo, rActor, rAction);
 	return true;
 end
