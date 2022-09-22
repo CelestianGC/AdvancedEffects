@@ -1,7 +1,16 @@
--- 
--- Please see the license.html file included with this distribution for 
+--
+-- Please see the license.html file included with this distribution for
 -- attribution and copyright information.
 --
+-- luacheck: globals onAttackAction onDamageAction
+
+-- add itemPath to rActor so that when effects are checked we can
+-- make compare against action only effects
+-- luacheck: globals advancedEffectsPiece
+function advancedEffectsPiece(nodeWeapon)
+	local _, sRecord = DB.getValue(nodeWeapon, "shortcut", "", "");
+	return sRecord;
+end
 
 function onAttackAction(draginfo)
 	local nodeWeapon = getDatabaseNode();
@@ -18,38 +27,42 @@ function onAttackAction(draginfo)
 
 	-- add itemPath to rActor so that when effects are checked we can 
 	-- make compare against action only effects
-	local _, sRecord = DB.getValue(nodeWeapon, "shortcut", "", "");
-	rActor.itemPath = sRecord;
-	-- end Adanced Effects Piece ---
+	rActor.itemPath = advancedEffectsPiece(nodeWeapon);
+	-- end Advanced Effects Piece ---
 
 	-- bmos adding AmmunitionManager integration
 	if AmmunitionManager then
-		local nodeAmmo = AmmunitionManager.getAmmoNode(nodeWeapon, rActor)
+		local nodeAmmo = AmmunitionManager.getAmmoNode(nodeWeapon, rActor);
 		if nodeAmmo then
-			rActor.ammoPath = nodeAmmo.getPath()
+			rActor.ammoPath = nodeAmmo.getPath();
 		end
 	end
 	--end bmos adding ammoPath
 
 	-- bmos adding AmmoManager loading weapon support and checking for ammo
-	if not AmmunitionManager then	
+	if not AmmunitionManager then
 		ActionAttack.performRoll(draginfo, rActor, rAction);
 		return true;
 	else
-		local bLoading = DB.getValue(nodeWeapon, 'properties', ''):lower():find('loading') ~= nil
-		local bIsLoaded = DB.getValue(nodeWeapon, 'isloaded', 0) == 1
+		local nAmmo, bInfiniteAmmo = AmmunitionManager.getAmmoRemaining(rActor, nodeWeapon, AmmunitionManager.getAmmoNode(nodeWeapon));
+		local messagedata = { text = '', sender = rActor.sName, font = "emotefont" };
+
+		local bLoading = self.isLoading(nodeWeapon);
+		local bIsLoaded = DB.getValue(nodeWeapon, 'isloaded', 0) == 1;
 		if not bLoading or (bLoading and bIsLoaded) then
-			local nAmmo, bInfiniteAmmo = AmmunitionManager.getAmmoRemaining(rActor, nodeWeapon, AmmunitionManager.getAmmoNode(nodeWeapon))
-			if (bInfiniteAmmo or nAmmo > 0) then	
-				if bLoading then DB.setValue(nodeWeapon, 'isloaded', 'number', 0); end
+			if bLoading then DB.setValue(nodeWeapon, 'isloaded', 'number', 0); end
+
+			if (bInfiniteAmmo or nAmmo > 0) then
 				ActionAttack.performRoll(draginfo, rActor, rAction);
 				return true;
 			else
-				ChatManager.Message(Interface.getString("char_message_atkwithnoammo"), true, rActor);
-				if bLoading then DB.setValue(nodeWeapon, 'isloaded', 'number', 0); end
+				messagedata.text = Interface.getString('char_message_atkwithnoammo');
+				Comm.deliverChatMessage(messagedata);
 			end
 		else
-			ChatManager.Message(string.format(Interface.getString('char_actions_notloaded'), DB.getValue(nodeWeapon, 'name', 'weapon')), true, rActor);
+			local sWeaponName = DB.getValue(nodeWeapon, 'name', 'weapon');
+			messagedata.text = string.format(Interface.getString('char_actions_notloaded'), sWeaponName, true, rActor);
+			Comm.deliverChatMessage(messagedata);
 		end
 	end
 	-- end bmos adding loading weapon and ammo check support
@@ -67,19 +80,18 @@ function onDamageAction(draginfo)
 
 	-- add itemPath to rActor so that when effects are checked we can 
 	-- make compare against action only effects
-	local _, sRecord = DB.getValue(nodeWeapon, "shortcut", "", "");
-	rActor.itemPath = sRecord;
-	-- end Adanced Effects Piece ---
+	rActor.itemPath = advancedEffectsPiece(nodeWeapon);
+	-- end Advanced Effects Piece ---
 
 	-- bmos adding AmmunitionManager integration
 	if AmmunitionManager then
-		local nodeAmmo = AmmunitionManager.getAmmoNode(nodeWeapon, rActor)
+		local nodeAmmo = AmmunitionManager.getAmmoNode(nodeWeapon, rActor);
 		if nodeAmmo then
-			rActor.ammoPath = nodeAmmo.getPath()
+			rActor.ammoPath = nodeAmmo.getPath();
 		end
 	end
 	-- end bmos adding ammoPath
-	
+
 	ActionDamage.performRoll(draginfo, rActor, rAction);
 	return true;
 end
