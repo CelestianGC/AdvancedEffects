@@ -11,22 +11,24 @@ function onInit()
     local sName = DB.getValue(nodeItem,"name","");
     name.setValue(sName);
 
+    -- DB.addHandler(node.getPath(),"onChildUpdate", update);
     -- watch these variables and update display string if they change
-    DB.addHandler(DB.getPath(node, ".effect"),"onUpdate", update);
-    DB.addHandler(DB.getPath(node, ".durdice"),"onUpdate", update);
-    DB.addHandler(DB.getPath(node, ".durmod"),"onUpdate", update);
-    DB.addHandler(DB.getPath(node, ".durunit"),"onUpdate", update);
-    DB.addHandler(DB.getPath(node, ".visibility"),"onUpdate", update);
-    DB.addHandler(DB.getPath(node, ".actiononly"),"onUpdate", update);
+    DB.addHandler(DB.getPath(node, "effect"),"onUpdate", update);
+    DB.addHandler(DB.getPath(node, "durdice"),"onUpdate", update);
+    DB.addHandler(DB.getPath(node, "durmod"),"onUpdate", update);
+    DB.addHandler(DB.getPath(node, "durunit"),"onUpdate", update);
+    DB.addHandler(DB.getPath(node, "visibility"),"onUpdate", update);
+    DB.addHandler(DB.getPath(node, "actiononly"),"onUpdate", update);
     update();
 end
 function onClose()
-    DB.removeHandler(DB.getPath(node, ".effect"),"onUpdate", update);
-    DB.removeHandler(DB.getPath(node, ".durdice"),"onUpdate", update);
-    DB.removeHandler(DB.getPath(node, ".durmod"),"onUpdate", update);
-    DB.removeHandler(DB.getPath(node, ".durunit"),"onUpdate", update);
-    DB.removeHandler(DB.getPath(node, ".visibility"),"onUpdate", update);
-    DB.removeHandler(DB.getPath(node, ".actiononly"),"onUpdate", update);
+    -- DB.removeHandler(node.getPath(),"onChildUpdate", update);
+    DB.removeHandler(DB.getPath(node, "effect"),"onUpdate", update);
+    DB.removeHandler(DB.getPath(node, "durdice"),"onUpdate", update);
+    DB.removeHandler(DB.getPath(node, "durmod"),"onUpdate", update);
+    DB.removeHandler(DB.getPath(node, "durunit"),"onUpdate", update);
+    DB.removeHandler(DB.getPath(node, "visibility"),"onUpdate", update);
+    DB.removeHandler(DB.getPath(node, "actiononly"),"onUpdate", update);
 end
 
 -- update display string 
