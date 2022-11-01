@@ -15,41 +15,41 @@ function onInit()
             DB.setValue(node,"visibility","string","hide");
         end
     end
-    DB.addHandler(DB.getPath(node, ".type"),"onUpdate", update);
-    DB.addHandler(DB.getPath(node, ".save_type"), "onUpdate", updateSaveEffects);
-    DB.addHandler(DB.getPath(node, ".save"), "onUpdate", updateSaveEffects);
-    DB.addHandler(DB.getPath(node, ".save_modifier"), "onUpdate", updateSaveEffects);
+    DB.addHandler(DB.getPath(node, "type"),"onUpdate", update);
+    DB.addHandler(DB.getPath(node, "save_type"), "onUpdate", updateSaveEffects);
+    DB.addHandler(DB.getPath(node, "save"), "onUpdate", updateSaveEffects);
+    DB.addHandler(DB.getPath(node, "save_modifier"), "onUpdate", updateSaveEffects);
 
-    DB.addHandler(DB.getPath(node, ".ability_type"), "onUpdate", updateAbilityEffects);
-    DB.addHandler(DB.getPath(node, ".ability"), "onUpdate", updateAbilityEffects);
-    DB.addHandler(DB.getPath(node, ".ability_modifier"), "onUpdate", updateAbilityEffects);
+    DB.addHandler(DB.getPath(node, "ability_type"), "onUpdate", updateAbilityEffects);
+    DB.addHandler(DB.getPath(node, "ability"), "onUpdate", updateAbilityEffects);
+    DB.addHandler(DB.getPath(node, "ability_modifier"), "onUpdate", updateAbilityEffects);
 
-    DB.addHandler(DB.getPath(node, ".susceptiblity_type"), "onUpdate", updateSusceptibleEffects);
-    DB.addHandler(DB.getPath(node, ".susceptiblity"), "onUpdate", updateSusceptibleEffects);
-    DB.addHandler(DB.getPath(node, ".susceptiblity_modifier"), "onUpdate", updateSusceptibleEffects);
+    DB.addHandler(DB.getPath(node, "susceptiblity_type"), "onUpdate", updateSusceptibleEffects);
+    DB.addHandler(DB.getPath(node, "susceptiblity"), "onUpdate", updateSusceptibleEffects);
+    DB.addHandler(DB.getPath(node, "susceptiblity_modifier"), "onUpdate", updateSusceptibleEffects);
 
-    DB.addHandler(DB.getPath(node, ".misc_type"), "onUpdate", updateMiscEffects);
-    DB.addHandler(DB.getPath(node, ".misc_modifier"), "onUpdate", updateMiscEffects);
+    DB.addHandler(DB.getPath(node, "misc_type"), "onUpdate", updateMiscEffects);
+    DB.addHandler(DB.getPath(node, "misc_modifier"), "onUpdate", updateMiscEffects);
     update();
 end
 
 function onClose()
     local node = getDatabaseNode();
-    DB.removeHandler(DB.getPath(node, ".type"),"onUpdate", update);
-    DB.removeHandler(DB.getPath(node, ".save_type"), "onUpdate", updateSaveEffects);
-    DB.removeHandler(DB.getPath(node, ".save"), "onUpdate", updateSaveEffects);
-    DB.removeHandler(DB.getPath(node, ".save_modifier"), "onUpdate", updateSaveEffects);
+    DB.removeHandler(DB.getPath(node, "type"),"onUpdate", update);
+    DB.removeHandler(DB.getPath(node, "save_type"), "onUpdate", updateSaveEffects);
+    DB.removeHandler(DB.getPath(node, "save"), "onUpdate", updateSaveEffects);
+    DB.removeHandler(DB.getPath(node, "save_modifier"), "onUpdate", updateSaveEffects);
 
-    DB.removeHandler(DB.getPath(node, ".ability_type"), "onUpdate", updateAbilityEffects);
-    DB.removeHandler(DB.getPath(node, ".ability"), "onUpdate", updateAbilityEffects);
-    DB.removeHandler(DB.getPath(node, ".ability_modifier"), "onUpdate", updateAbilityEffects);
+    DB.removeHandler(DB.getPath(node, "ability_type"), "onUpdate", updateAbilityEffects);
+    DB.removeHandler(DB.getPath(node, "ability"), "onUpdate", updateAbilityEffects);
+    DB.removeHandler(DB.getPath(node, "ability_modifier"), "onUpdate", updateAbilityEffects);
     
-    DB.removeHandler(DB.getPath(node, ".susceptiblity_type"), "onUpdate", updateSusceptibleEffects);
-    DB.removeHandler(DB.getPath(node, ".susceptiblity"), "onUpdate", updateSusceptibleEffects);
-    DB.removeHandler(DB.getPath(node, ".susceptiblity_modifier"), "onUpdate", updateSusceptibleEffects);
+    DB.removeHandler(DB.getPath(node, "susceptiblity_type"), "onUpdate", updateSusceptibleEffects);
+    DB.removeHandler(DB.getPath(node, "susceptiblity"), "onUpdate", updateSusceptibleEffects);
+    DB.removeHandler(DB.getPath(node, "susceptiblity_modifier"), "onUpdate", updateSusceptibleEffects);
 
-    DB.removeHandler(DB.getPath(node, ".misc_type"), "onUpdate", updateMiscEffects);
-    DB.removeHandler(DB.getPath(node, ".misc_modifier"), "onUpdate", updateMiscEffects);
+    DB.removeHandler(DB.getPath(node, "misc_type"), "onUpdate", updateMiscEffects);
+    DB.removeHandler(DB.getPath(node, "misc_modifier"), "onUpdate", updateMiscEffects);
 end
 
 function update()
