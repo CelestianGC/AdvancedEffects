@@ -80,7 +80,11 @@
 				if super and super.onInit then
 					super.onInit()
 				end
-				text.setAnchor("top", "contentframe", "top", "absolute", 65);
+				if text then
+					text.setAnchor("top", "contentframe", "top", "absolute", 65);
+				else
+					advanced_effects_contents.setVisible(false);
+				end
 			end
 		</script>
 		<sheetdata>
@@ -99,6 +103,24 @@
 				<anchored to="advanced_effects_contents" />
 				<target>advanced_effects_contents</target>
 			</scrollbar>
+		</sheetdata>
+	</windowclass>
+	
+	<windowclass name="feat_main" merge="join">
+		<sheetdata>
+			<!-- effects -->
+			<subwindow name="advanced_effects_contents" insertbefore="type_label">
+				<anchored>
+					<top parent="columnanchor" anchor="bottom" relation="relative" offset="0" />
+					<left offset="5" />
+					<right offset="5" />
+				</anchored>
+				<class>advanced_effects_subwindow</class>
+				<activate />
+				<fastinit />
+				<invisible />
+			</subwindow>
+			<!-- end advanced effects entry -->
 		</sheetdata>
 	</windowclass>
 
