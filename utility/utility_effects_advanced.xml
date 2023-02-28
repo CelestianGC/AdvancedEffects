@@ -84,13 +84,17 @@
 			</genericcontrol>
 
             <!-- editor button -->
-            <button_poweractioneditor name="effectdetail">
-				<editor>advanced_effect_editor</editor>
+            <button_details name="effectdetail">
+				<script>
+					function onButtonPress()
+						Interface.openWindow("advanced_effect_editor", window.getDatabaseNode());
+					end
+				</script>
 				<anchored to="rightanchor">
 					<top />
 					<right anchor="left" relation="relative" offset="-25" />
 				</anchored>
-			</button_poweractioneditor>
+			</button_details>
             
             <!-- delete button if in edit mode -->
 			<button_idelete name="idelete">
