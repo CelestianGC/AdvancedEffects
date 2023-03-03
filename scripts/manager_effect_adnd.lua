@@ -49,6 +49,7 @@ function onInit()
   EffectManager5E.checkConditionalHelper = checkConditionalHelper;
   EffectManager5E.getEffectsByType = getEffectsByType;
   EffectManager5E.hasEffect = hasEffect;
+  EffectManager5E.hasEffectCondition = hasEffectCondition;
 
   -- used for AD&D Core ONLY
   --EffectManager5E.evalAbilityHelper = evalAbilityHelper;
@@ -548,8 +549,14 @@ function getEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTargetedO
 	-- Determine effect type targeting
 	local bTargetSupport = StringManager.isWord(sEffectType, DataCommon.targetableeffectcomps);
 	
+	local aEffects = {};
+	if TurboManager then
+		aEffects = TurboManager.getMatchedEffects(rActor, sEffectType);
+	else
+		aEffects = DB.getChildren(ActorManager.getCTNode(rActor), "effects");
+	end
 	-- Iterate through effects
-	for _,v in pairs(DB.getChildren(ActorManager.getCTNode(rActor), "effects")) do
+	for _, v in pairs(aEffects) do
 		-- Check active
 		local nActive = DB.getValue(v, "isactive", 0);
 		--if ( nActive ~= 0 and ( not bItemTriggered or (bItemTriggered and bItemSource) ) ) then
@@ -687,6 +694,10 @@ function getEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTargetedO
 	return results;
 end
 
+function hasEffectCondition(rActor, sEffect)
+    return EffectManager5E.hasEffect(rActor, sEffect, nil, false, true);
+end
+
 -- replace 5E EffectManager5E manager_effect_5E.lua hasEffect() with this
 function hasEffect(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEffectTargets)
 	if not sEffect or not rActor then
@@ -694,9 +705,15 @@ function hasEffect(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEffectTargets
 	end
 	local sLowerEffect = sEffect:lower();
 	
-	-- Iterate through each effect
 	local aMatch = {};
-	for _,v in pairs(DB.getChildren(ActorManager.getCTNode(rActor), "effects")) do
+	local aEffects = {};
+	if TurboManager then
+		aEffects = TurboManager.getMatchedEffects(rActor, sEffect);
+	else
+		aEffects = DB.getChildren(ActorManager.getCTNode(rActor), "effects");
+	end
+	-- Iterate through effects
+	for _, v in pairs(aEffects) do
 		local nActive = DB.getValue(v, "isactive", 0);
         if (EffectManagerADND.isValidCheckEffect(rActor,v)) then
 			-- Parse each effect label
