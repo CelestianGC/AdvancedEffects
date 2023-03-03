@@ -14,7 +14,7 @@ end
 
 function onAttackAction(draginfo)
 	local nodeWeapon = getDatabaseNode();
-	local nodeChar = nodeWeapon.getChild("...")
+	local nodeChar = DB.getChild(nodeWeapon, "...")
 
 	-- Build basic attack action record
 	local rAction = CharWeaponManager.buildAttackAction(nodeChar, nodeWeapon);
@@ -25,7 +25,7 @@ function onAttackAction(draginfo)
 	-- Perform action
 	local rActor = ActorManager.resolveActor(nodeChar);
 
-	-- add itemPath to rActor so that when effects are checked we can 
+	-- add itemPath to rActor so that when effects are checked we can
 	-- make compare against action only effects
 	rActor.itemPath = advancedEffectsPiece(nodeWeapon);
 	-- end Advanced Effects Piece ---
@@ -34,7 +34,7 @@ function onAttackAction(draginfo)
 	if AmmunitionManager then
 		local nodeAmmo = AmmunitionManager.getAmmoNode(nodeWeapon, rActor);
 		if nodeAmmo then
-			rActor.ammoPath = nodeAmmo.getPath();
+			rActor.ammoPath = DB.getPath(nodeAmmo);
 		end
 	end
 	--end bmos adding ammoPath
@@ -70,7 +70,7 @@ end
 
 function onDamageAction(draginfo)
 	local nodeWeapon = getDatabaseNode();
-	local nodeChar = nodeWeapon.getChild("...")
+	local nodeChar = DB.getChild(nodeWeapon, "...")
 
 	-- Build basic damage action record
 	local rAction = CharWeaponManager.buildDamageAction(nodeChar, nodeWeapon);
@@ -78,7 +78,7 @@ function onDamageAction(draginfo)
 	-- Perform damage action
 	local rActor = ActorManager.resolveActor(nodeChar);
 
-	-- add itemPath to rActor so that when effects are checked we can 
+	-- add itemPath to rActor so that when effects are checked we can
 	-- make compare against action only effects
 	rActor.itemPath = advancedEffectsPiece(nodeWeapon);
 	-- end Advanced Effects Piece ---
@@ -87,7 +87,7 @@ function onDamageAction(draginfo)
 	if AmmunitionManager then
 		local nodeAmmo = AmmunitionManager.getAmmoNode(nodeWeapon, rActor);
 		if nodeAmmo then
-			rActor.ammoPath = nodeAmmo.getPath();
+			rActor.ammoPath = DB.getPath(nodeAmmo);
 		end
 	end
 	-- end bmos adding ammoPath
