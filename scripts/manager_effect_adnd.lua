@@ -251,7 +251,8 @@ function updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquipped, nId
       rEffect.nInit = 0;
       rEffect.sSource = sItemSource;
       rEffect.nGMOnly = nDMOnly;
-      rEffect.sApply = "";
+      rEffect.sApply = DB.getValue(nodeItemEffect, "apply", "");
+      rEffect.sChangeState = DB.getValue(nodeItemEffect, "changestate", "");
 
       sendEffectAddedMessage(nodeChar, rEffect, sLabel, nDMOnly)
       EffectManager.addEffect("", "", nodeChar, rEffect, false);
@@ -303,7 +304,8 @@ function updateCharEffect(nodeCharEffect,nodeEntry)
   rEffect.nInit = 0;
   --rEffect.sSource = DB.getPath(nodeEntry);
   rEffect.nGMOnly = nDMOnly;
-  rEffect.sApply = "";
+  rEffect.sApply = DB.getValue(nodeCharEffect, "apply", "");
+  rEffect.sChangeState = DB.getValue(nodeCharEffect, "changestate", "");
 
   sendEffectAddedMessage(nodeEntry, rEffect, sLabel, nDMOnly);
   EffectManager.addEffect("", "", nodeEntry, rEffect, false);
