@@ -47,7 +47,7 @@ function onAttackAction(draginfo)
 		local nAmmo, bInfiniteAmmo = AmmunitionManager.getAmmoRemaining(rActor, nodeWeapon, AmmunitionManager.getAmmoNode(nodeWeapon));
 		local messagedata = { text = '', sender = rActor.sName, font = "emotefont" };
 
-		local bLoading = self.isLoading(nodeWeapon);
+		local bLoading = AmmunitionManager.hasLoadAction(nodeWeapon);
 		local bIsLoaded = DB.getValue(nodeWeapon, 'isloaded', 0) == 1;
 		if not bLoading or (bLoading and bIsLoaded) then
 			if bLoading then DB.setValue(nodeWeapon, 'isloaded', 'number', 0); end
