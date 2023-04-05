@@ -11,7 +11,7 @@ function onInit()
     local sName = DB.getValue(nodeItem,"name","");
     name.setValue(sName);
 
-    -- DB.addHandler(node.getPath(),"onChildUpdate", update);
+    -- DB.addHandler(DB.getPath(node),"onChildUpdate", update);
     -- watch these variables and update display string if they change
     DB.addHandler(DB.getPath(node, "effect"),"onUpdate", update);
     DB.addHandler(DB.getPath(node, "durdice"),"onUpdate", update);
@@ -22,7 +22,7 @@ function onInit()
     update();
 end
 function onClose()
-    -- DB.removeHandler(node.getPath(),"onChildUpdate", update);
+    -- DB.removeHandler(DB.getPath(node),"onChildUpdate", update);
     DB.removeHandler(DB.getPath(node, "effect"),"onUpdate", update);
     DB.removeHandler(DB.getPath(node, "durdice"),"onUpdate", update);
     DB.removeHandler(DB.getPath(node, "durmod"),"onUpdate", update);
@@ -31,7 +31,7 @@ function onClose()
     DB.removeHandler(DB.getPath(node, "actiononly"),"onUpdate", update);
 end
 
--- update display string 
+-- update display string
 function update()
     local node = getDatabaseNode();
     -- display dice/mods for duration --celestian
@@ -39,7 +39,7 @@ function update()
     local dDurationDice = DB.getValue(node, "durdice");
     local nDurationMod = DB.getValue(node, "durmod", 0);
     local sDurDice = StringManager.convertDiceToString(dDurationDice);
-    if (sDurDice ~= "") then 
+    if (sDurDice ~= "") then
         sDuration = sDuration .. sDurDice;
     end
     if (nDurationMod ~= 0 and sDurDice ~= "") then
@@ -51,7 +51,7 @@ function update()
     elseif (nDurationMod ~= 0) then
         sDuration = sDuration .. nDurationMod;
     end
-    
+
     local sUnits = DB.getValue(node, "durunit", "");
     if sDuration ~= "" then
         --local nDuration = tonumber(sDuration);

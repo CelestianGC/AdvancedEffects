@@ -44,15 +44,16 @@ function onInit()
   --CoreRPG replacements
   decodeActors_old = ActionsManager.decodeActors;
   ActionsManager.decodeActors = decodeActors;
-  
+
   -- 5E effects replacements
   EffectManager5E.checkConditionalHelper = checkConditionalHelper;
   EffectManager5E.getEffectsByType = getEffectsByType;
   EffectManager5E.hasEffect = hasEffect;
+  EffectManager5E.hasEffectCondition = hasEffectCondition;
 
   -- used for AD&D Core ONLY
   --EffectManager5E.evalAbilityHelper = evalAbilityHelper;
-  
+
   -- used for 5E extension ONLY
   ActionAttack.performRoll = manager_action_attack_performRoll;
   ActionDamage.performRoll = manager_action_damage_performRoll;
@@ -67,8 +68,8 @@ function onInit()
   PowerManager.performAction = manager_power_performAction;
 
     -- option in house rule section, enable/disable allow PCs to edit advanced effects.
-	OptionsManager.registerOption2("ADND_AE_EDIT", false, "option_header_houserule", "option_label_ADND_AE_EDIT", "option_entry_cycler", 
-			{ labels = "option_label_ADND_AE_enabled" , values = "enabled", baselabel = "option_label_ADND_AE_disabled", baseval = "disabled", default = "disabled" });    
+	OptionsManager.registerOption2("ADND_AE_EDIT", false, "option_header_houserule", "option_label_ADND_AE_EDIT", "option_entry_cycler",
+			{ labels = "option_label_ADND_AE_enabled" , values = "enabled", baselabel = "option_label_ADND_AE_disabled", baseval = "disabled", default = "disabled" });
 end
 
 -- run from addHandler for updated item effect options
@@ -77,48 +78,44 @@ function inventoryUpdateItemEffects(nodeField)
 end
 -- update single item from edit for *.effect handler
 function updateItemEffectsForEdit(nodeField)
-  checkEffectsAfterEdit(nodeField.getChild(".."));
+  checkEffectsAfterEdit(DB.getChild(nodeField, ".."));
 end
 -- find the effect for this source and delete and re-build
 function checkEffectsAfterEdit(itemNode)
   local nodeChar = nil
-  local bIDUpdated = false;
-  if itemNode.getPath():match("%.effectlist%.") then
+  if DB.getPath(itemNode):match("%.effectlist%.") then
     nodeChar = DB.getChild(itemNode, ".....");
   else
     nodeChar = DB.getChild(itemNode, "...");
-    bIDUpdated = true;
   end
   local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(nodeChar));
   if nodeCT then
-    for _,nodeEffect in pairs(DB.getChildren(nodeCT, "effects")) do
-      local sLabel = DB.getValue(nodeEffect, "label", "");
+    for _,nodeEffect in ipairs(DB.getChildList(nodeCT, "effects")) do
       local sEffSource = DB.getValue(nodeEffect, "source_name", "");
       -- see if the node exists and if it's in an inventory node
       local nodeEffectFound = DB.findNode(sEffSource);
       if (nodeEffectFound  and string.match(sEffSource,"inventorylist")) then
-        local nodeEffectItem = nodeEffectFound.getChild("...");
+        local nodeEffectItem = DB.getChild(nodeEffectFound, "...");
         if nodeEffectFound == itemNode then -- effect hide/show edit
-          nodeEffect.delete();
+		  DB.deleteNode(nodeEffect);
           updateItemEffects(DB.getChild(itemNode, "..."));
         elseif nodeEffectItem == itemNode then -- id state was changed
-          nodeEffect.delete();
+		  DB.deleteNode(nodeEffect);
           updateItemEffects(nodeEffectItem);
         end
       end
     end
   end
 end
--- this checks to see if an effect is missing a associated item that applied the effect 
+-- this checks to see if an effect is missing a associated item that applied the effect
 -- when items are deleted and then clears that effect if it's missing.
 function updateFromDeletedInventory(node)
 --Debug.console("manager_effect_adnd.lua","updateFromDeletedInventory","node",node);
     local nodeChar = DB.getChild(node, "..");
     local bisNPC = (not ActorManager.isPC(nodeChar));
-    local nodeTarget = nodeChar;
     local nodeCT = ActorManager.getCTNode(ActorManager.resolveActor(nodeChar));
     -- if we're already in a combattracker situation (npcs)
-    if bisNPC and string.match(nodeChar.getPath(),"^combattracker") then
+    if bisNPC and string.match(DB.getPath(nodeChar),"^combattracker") then
         nodeCT = nodeChar;
     end
     if nodeCT then
@@ -129,11 +126,11 @@ function updateFromDeletedInventory(node)
 	--onEncumbranceChanged();
 end
 
--- this checks to see if an effect is missing a associated item that applied the effect 
+-- this checks to see if an effect is missing a associated item that applied the effect
 -- when items are deleted and then clears that effect if it's missing.
 function checkEffectsAfterDelete(nodeChar)
     local sUser = User.getUsername();
-    for _,nodeEffect in pairs(DB.getChildren(nodeChar, "effects")) do
+    for _,nodeEffect in ipairs(DB.getChildList(nodeChar, "effects")) do
         local sLabel = DB.getValue(nodeEffect, "label", "");
         local sEffSource = DB.getValue(nodeEffect, "source_name", "");
         -- see if the node exists and if it's in an inventory node
@@ -158,9 +155,9 @@ function checkEffectsAfterDelete(nodeChar)
             else
                 Comm.deliverChatMessage(msg);
             end
-            nodeEffect.delete();
+			DB.deleteNode(nodeEffect);
         end
-        
+
     end
 end
 
@@ -170,11 +167,10 @@ function updateItemEffects(nodeItem)
     if not nodeChar then
         return;
     end
-    local sUser = User.getUsername();
     local sName = DB.getValue(nodeItem, "name", "");
     -- we swap the node to the combat tracker node
     -- so the "effect" is written to the right node
-    if not string.match(nodeChar.getPath(),"^combattracker") then
+    if not string.match(DB.getPath(nodeChar),"^combattracker") then
         nodeChar = ActorManager.getCTNode(ActorManager.resolveActor(nodeChar));
     end
     -- if not in the combat tracker bail
@@ -186,25 +182,24 @@ function updateItemEffects(nodeItem)
     local bEquipped = (nCarried == 2);
     local nIdentified = DB.getValue(nodeItem, "isidentified", 1);
     -- local bOptionID = OptionsManager.isOption("MIID", "on");
-    -- if not bOptionID then 
+    -- if not bOptionID then
         -- nIdentified = 1;
     -- end
 
-    for _,nodeItemEffect in pairs(DB.getChildren(nodeItem, "effectlist")) do
+    for _,nodeItemEffect in ipairs(DB.getChildList(nodeItem, "effectlist")) do
         updateItemEffect(nodeItemEffect, sName, nodeChar, nil, bEquipped, nIdentified);
     end -- for item's effects list
 end
 
 -- update single effect for item
 function updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquipped, nIdentified)
-  local sCharacterName = DB.getValue(nodeChar, "name", "");
-  local sItemSource = nodeItemEffect.getPath();
+  local sItemSource = DB.getPath(nodeItemEffect);
   local sLabel = DB.getValue(nodeItemEffect, "effect", "");
--- Debug.console("manager_effect_adnd.lua","updateItemEffect","bEquipped",bEquipped);    
--- Debug.console("manager_effect_adnd.lua","updateItemEffect","nodeItemEffect",nodeItemEffect);  
+-- Debug.console("manager_effect_adnd.lua","updateItemEffect","bEquipped",bEquipped);
+-- Debug.console("manager_effect_adnd.lua","updateItemEffect","nodeItemEffect",nodeItemEffect);
   if sLabel and sLabel ~= "" then -- if we have effect string
     local bFound = false;
-    for _,nodeEffect in pairs(DB.getChildren(nodeChar, "effects")) do
+    for _,nodeEffect in ipairs(DB.getChildList(nodeChar, "effects")) do
       local nActive = DB.getValue(nodeEffect, "isactive", 0);
       local nDMOnly = DB.getValue(nodeEffect, "isgmonly", 0);
       if (nActive ~= 0) then
@@ -212,14 +207,14 @@ function updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquipped, nId
         if (sEffSource == sItemSource) then
           bFound = true;
           if (not bEquipped) then
-            sendEffectRemovedMessage(nodeChar, nodeEffect, sLabel, nDMOnly, sUser)
-            nodeEffect.delete();
+            sendEffectRemovedMessage(nodeChar, nodeEffect, sLabel, nDMOnly);
+			DB.deleteNode(nodeEffect);
             break;
           end -- not equipped
         end -- effect source == item source
       end -- was active
     end -- nodeEffect for
-      
+
     if (not bFound and bEquipped) then
       local rEffect = {};
       local nRollDuration = 0;
@@ -241,24 +236,25 @@ function updateItemEffect(nodeItemEffect, sName, nodeChar, sUser, bEquipped, nId
       elseif nIdentified > 0  then
         nDMOnly = 0;
       end
-      
+
       if not ActorManager.isPC(nodeChar) then
         local bTokenVis = (DB.getValue(nodeChar,"tokenvis",1) == 1);
         if not bTokenVis then
           nDMOnly = 1; -- hide if token not visible
         end
       end
-      
+
       rEffect.nDuration = nRollDuration;
       rEffect.sName = sName .. ";" .. sLabel;
-      rEffect.sLabel = sLabel; 
+      rEffect.sLabel = sLabel;
       rEffect.sUnits = DB.getValue(nodeItemEffect, "durunit", "");
       rEffect.nInit = 0;
       rEffect.sSource = sItemSource;
       rEffect.nGMOnly = nDMOnly;
-      rEffect.sApply = "";
-      
-      sendEffectAddedMessage(nodeChar, rEffect, sLabel, nDMOnly, sUser)
+      rEffect.sApply = DB.getValue(nodeItemEffect, "apply", "");
+      rEffect.sChangeState = DB.getValue(nodeItemEffect, "changestate", "");
+
+      sendEffectAddedMessage(nodeChar, rEffect, sLabel, nDMOnly)
       EffectManager.addEffect("", "", nodeChar, rEffect, false);
     end
   end
@@ -268,9 +264,9 @@ end
 -- nodeChar: node of PC/NPC in PC/NPCs record list
 -- nodeEntry: node in combat tracker for PC/NPC
 function updateCharEffects(nodeChar,nodeEntry)
-    for _,nodeCharEffect in pairs(DB.getChildren(nodeChar, "effectlist")) do
+    for _,nodeCharEffect in ipairs(DB.getChildList(nodeChar, "effectlist")) do
         updateCharEffect(nodeCharEffect,nodeEntry);
-    end -- for item's effects list 
+    end -- for item's effects list
 end
 -- this will be used to manage PC/NPC effectslist objects
 -- nodeCharEffect: node in effectlist on PC/NPC
@@ -298,23 +294,24 @@ function updateCharEffect(nodeCharEffect,nodeEntry)
   if (not bisPC) then
     nDMOnly = 1; -- npcs effects always hidden from PCs/chat when we first drag/drop into CT
   end
-  
+
   local rEffect = {};
   rEffect.nDuration = nRollDuration;
   --rEffect.sName = sName .. ";" .. sLabel;
   rEffect.sName = sLabel;
-  rEffect.sLabel = sLabel; 
+  rEffect.sLabel = sLabel;
   rEffect.sUnits = DB.getValue(nodeCharEffect, "durunit", "");
   rEffect.nInit = 0;
-  --rEffect.sSource = nodeEntry.getPath();
+  --rEffect.sSource = DB.getPath(nodeEntry);
   rEffect.nGMOnly = nDMOnly;
-  rEffect.sApply = "";
+  rEffect.sApply = DB.getValue(nodeCharEffect, "apply", "");
+  rEffect.sChangeState = DB.getValue(nodeCharEffect, "changestate", "");
 
-  sendEffectAddedMessage(nodeEntry, rEffect, sLabel, nDMOnly, sUser);
+  sendEffectAddedMessage(nodeEntry, rEffect, sLabel, nDMOnly);
   EffectManager.addEffect("", "", nodeEntry, rEffect, false);
 end
 
--- custom version of the one in CoreRPG to deal with adding new 
+-- custom version of the one in CoreRPG to deal with adding new
 -- pcs to the combat tracker to deal with advanced effects. --celestian
 function onPCPostAdd(tCustom)
 	-- add this to make the npc show up first time for Situational Awareness
@@ -323,8 +320,8 @@ function onPCPostAdd(tCustom)
 
     -- now flip through inventory and pass each to updateEffects()
     -- so that if they have a combat_effect it will be applied.
-    for _,nodeItem in pairs(DB.getChildren(tCustom.nodeRecord, "inventorylist")) do
-        updateItemEffects(nodeItem,true);
+    for _,nodeItem in ipairs(DB.getChildList(tCustom.nodeRecord, "inventorylist")) do
+        updateItemEffects(nodeItem);
     end
     -- check to see if pc effects exists and if so apply --celestian
     updateCharEffects(tCustom.nodeRecord,tCustom.nodeCT);
@@ -344,8 +341,7 @@ end
 
 -- get the Connected Player's name that has this identity
 function getUserFromNode(node)
-  local sNodePath = node.getPath();
-  local _, sRecord = DB.getValue(node, "link", "", "");    
+  local _, sRecord = DB.getValue(node, "link", "", "");
   local sUser = nil;
   for _,vUser in ipairs(User.getActiveUsers()) do
     for _,vIdentity in ipairs(User.getActiveIdentities(vUser)) do
@@ -361,14 +357,14 @@ end
 -- build message to send that effect removed
 function sendEffectRemovedMessage(nodeChar, nodeEffect, sLabel, nDMOnly)
   local sUser = getUserFromNode(nodeChar);
---Debug.console("manager_effect_adnd.lua","sendEffectRemovedMessage","sUser",sUser);  
+--Debug.console("manager_effect_adnd.lua","sendEffectRemovedMessage","sUser",sUser);
   local sCharacterName = DB.getValue(nodeChar, "name", "");
   -- Build output message
   local msg = ChatManager.createBaseMessage(ActorManager.resolveActor(nodeChar),sUser);
   msg.text = "Advanced Effect ['" .. sLabel .. "'] ";
   msg.text = msg.text .. "removed [from " .. sCharacterName .. "]";
   -- HANDLE APPLIED BY SETTING
-  local sEffSource = DB.getValue(nodeEffect, "source_name", "");    
+  local sEffSource = DB.getValue(nodeEffect, "source_name", "");
   if sEffSource and sEffSource ~= "" then
       msg.text = msg.text .. " [by " .. DB.getValue(DB.findNode(sEffSource), "name", "") .. "]";
   end
@@ -377,7 +373,7 @@ end
 -- build message to send that effect added
 function sendEffectAddedMessage(nodeCT, rNewEffect, sLabel, nDMOnly)
   local sUser = getUserFromNode(nodeCT);
---Debug.console("manager_effect_adnd.lua","sendEffectAddedMessage","sUser",sUser);  
+--Debug.console("manager_effect_adnd.lua","sendEffectAddedMessage","sUser",sUser);
 	-- Build output message
 	local msg = ChatManager.createBaseMessage(ActorManager.resolveActor(nodeCT),sUser);
 	msg.text = "Advanced Effect ['" .. rNewEffect.sName .. "'] ";
@@ -391,7 +387,7 @@ end
 -- send message
 function sendRawMessage(sUser, nDMOnly, msg)
   local sIdentity = nil;
-  if sUser and sUser ~= "" then 
+  if sUser and sUser ~= "" then
     sIdentity = User.getCurrentIdentity(sUser) or nil;
   end
   if sIdentity then
@@ -403,7 +399,7 @@ function sendRawMessage(sUser, nDMOnly, msg)
   if nDMOnly == 1 then
     msg.secret = true;
     Comm.addChatMessage(msg);
-  elseif nDMOnly ~= 1 then 
+  elseif nDMOnly ~= 1 then
     --Comm.addChatMessage(msg);
     Comm.deliverChatMessage(msg);
   end
@@ -412,17 +408,17 @@ end
 ---	This function returns false if the effect is tied to an item and the item is not being used.
 function isValidCheckEffect(rActor, nodeEffect)
 	if DB.getValue(nodeEffect, "isactive", 0) ~= 0 then
-		local bItem, bActionItemUsed, bActionOnly = false, false, false
-		local sItemPath = ""
+		local bActionItemUsed, bActionOnly = false, false;
+		local sItemPath = "";
 
 		local sSource = DB.getValue(nodeEffect,"source_name","");
 		-- if source is a valid node and we can find "actiononly"
 		-- setting then we set it.
 		local node = DB.findNode(sSource);
 		if node then
-			local nodeItem = node.getChild("...");
+			local nodeItem = DB.getChild(node, "...");
 			if nodeItem then
-				sItemPath = nodeItem.getPath();
+				sItemPath = DB.getPath(nodeItem);
 				bActionOnly = (DB.getValue(node,"actiononly",0) ~= 0);
 			end
 		end
@@ -446,7 +442,7 @@ function isValidCheckEffect(rActor, nodeEffect)
 				end
 			end
 		end
-		
+
 		if bActionOnly and not bActionItemUsed then
 			return false;
 		else
@@ -467,7 +463,7 @@ end
 -- AD&D CORE ONLY
 function evalAbilityHelper(rActor, sEffectAbility)
 	-- local sSign, sModifier, sShortAbility = sEffectAbility:match("^%[([%+%-]?)([H2]?)([A-Z][A-Z][A-Z])%]$");
-	
+
 	-- local nAbility = nil;
 	-- if sShortAbility == "STR" then
 		-- nAbility = ActorManager5E.getAbilityBonus(rActor, "strength");
@@ -486,7 +482,7 @@ function evalAbilityHelper(rActor, sEffectAbility)
 	-- elseif sShortAbility == "PRF" then
 		-- nAbility = ActorManager5E.getAbilityBonus(rActor, "prf");
 	-- end
-	
+
 	-- if nAbility then
 		-- if sSign == "-" then
 			-- nAbility = 0 - nAbility;
@@ -501,23 +497,23 @@ function evalAbilityHelper(rActor, sEffectAbility)
 			-- nAbility = nAbility * 2;
 		-- end
 	-- end
-	
+
 	-- return nAbility;
     return 0;
 end
 
 --	replace CoreRPG ActionsManager manager_actions.lua decodeActors() with this
 function decodeActors(draginfo, ...)
-	local rSource, aTargets = decodeActors_old(draginfo, ...)
+	local rSource, aTargets = decodeActors_old(draginfo, ...);
 
-	local sItemPath = draginfo.getMetaData("itemPath")
+	local sItemPath = draginfo.getMetaData("itemPath");
 	if (sItemPath and sItemPath ~= "") then
-		rSource.itemPath = sItemPath
+		rSource.itemPath = sItemPath;
 	end
-	
+
 	local sAmmoPath = draginfo.getMetaData("ammoPath")
 	if AmmunitionManager and (sAmmoPath and sAmmoPath ~= "") then
-		rSource.ammoPath = sAmmoPath
+		rSource.ammoPath = sAmmoPath;
 	end
 
 	return rSource, aTargets;
@@ -529,7 +525,7 @@ function getEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTargetedO
 		return {};
 	end
 	local results = {};
-	
+
 	-- Set up filters
 	local aRangeFilter = {};
 	local aOtherFilter = {};
@@ -544,12 +540,16 @@ function getEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTargetedO
 			end
 		end
 	end
-	
-	-- Determine effect type targeting
-	local bTargetSupport = StringManager.isWord(sEffectType, DataCommon.targetableeffectcomps);
-	
+
+
+	local aEffects = {};
+	if TurboManager then
+		aEffects = TurboManager.getMatchedEffects(rActor, sEffectType);
+	else
+		aEffects = DB.getChildList(ActorManager.getCTNode(rActor), "effects");
+	end
 	-- Iterate through effects
-	for _,v in pairs(DB.getChildren(ActorManager.getCTNode(rActor), "effects")) do
+	for _, v in ipairs(aEffects) do
 		-- Check active
 		local nActive = DB.getValue(v, "isactive", 0);
 		--if ( nActive ~= 0 and ( not bItemTriggered or (bItemTriggered and bItemSource) ) ) then
@@ -579,7 +579,7 @@ function getEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTargetedO
 							break;
 						end
 						bTargeted = true;
-					
+
 					-- Compare other attributes
 					else
 						-- Strip energy/bonus types for subtype comparison
@@ -591,7 +591,7 @@ function getEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTargetedO
 							if #s > 0 and ((s:sub(1,1) == "!") or (s:sub(1,1) == "~")) then
 								s = s:sub(2);
 							end
-							if StringManager.contains(DataCommon.dmgtypes, s) or s == "all" or 
+							if StringManager.contains(DataCommon.dmgtypes, s) or s == "all" or
 									StringManager.contains(DataCommon.bonustypes, s) or
 									StringManager.contains(DataCommon.conditions, s) or
 									StringManager.contains(DataCommon.connectors, s) then
@@ -601,10 +601,10 @@ function getEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTargetedO
 							else
 								table.insert(aEffectOtherFilter, s);
 							end
-							
+
 							j = j + 1;
 						end
-					
+
 						-- Check for match
 						local comp_match = false;
 						if rEffectComp.type == sEffectType then
@@ -615,7 +615,7 @@ function getEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTargetedO
 							else
 								comp_match = true;
 							end
-						
+
 							-- Check filters
 							if #aEffectRangeFilter > 0 then
 								local bRangeMatch = false;
@@ -682,9 +682,13 @@ function getEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTargetedO
 			end -- END TARGET CHECK
 		end  -- END ACTIVE CHECK
 	end  -- END EFFECT LOOP
-	
+
 	-- RESULTS
 	return results;
+end
+
+function hasEffectCondition(rActor, sEffect)
+    return EffectManager5E.hasEffect(rActor, sEffect, nil, false, true);
 end
 
 -- replace 5E EffectManager5E manager_effect_5E.lua hasEffect() with this
@@ -693,10 +697,16 @@ function hasEffect(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEffectTargets
 		return false;
 	end
 	local sLowerEffect = sEffect:lower();
-	
-	-- Iterate through each effect
+
 	local aMatch = {};
-	for _,v in pairs(DB.getChildren(ActorManager.getCTNode(rActor), "effects")) do
+	local aEffects = {};
+	if TurboManager then
+		aEffects = TurboManager.getMatchedEffects(rActor, sEffect);
+	else
+		aEffects = DB.getChildList(ActorManager.getCTNode(rActor), "effects");
+	end
+	-- Iterate through effects
+	for _, v in ipairs(aEffects) do
 		local nActive = DB.getValue(v, "isactive", 0);
         if (EffectManagerADND.isValidCheckEffect(rActor,v)) then
 			-- Parse each effect label
@@ -720,7 +730,7 @@ function hasEffect(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEffectTargets
 					if not EffectManager5E.checkConditional(rTarget, v, rEffectComp.remainder, rActor) then
 						break;
 					end
-				
+
 				-- Check for match
 				elseif rEffectComp.original:lower() == sLowerEffect then
 					if bTargeted and not bIgnoreEffectTargets then
@@ -731,9 +741,9 @@ function hasEffect(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEffectTargets
 						nMatch = kEffectComp;
 					end
 				end
-				
+
 			end
-			
+
 			-- If matched, then remove one-off effects
 			if nMatch > 0 then
 				if nActive == 2 then
@@ -752,7 +762,7 @@ function hasEffect(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEffectTargets
 			end
 		end
 	end
-	
+
 	if #aMatch > 0 then
 		return true;
 	end
@@ -764,10 +774,8 @@ function checkConditionalHelper(rActor, sEffect, rTarget, aIgnore)
 	if not rActor then
 		return false;
 	end
-	
-	local bReturn = false;
-	
-	for _,v in pairs(DB.getChildren(ActorManager.getCTNode(rActor), "effects")) do
+
+	for _,v in ipairs(DB.getChildList(ActorManager.getCTNode(rActor), "effects")) do
 		if (EffectManagerADND.isValidCheckEffect(rActor,v) and not StringManager.contains(aIgnore, v.getNodeName())) then
 			-- Parse each effect label
 			local sLabel = DB.getValue(v, "label", "");
@@ -776,7 +784,7 @@ function checkConditionalHelper(rActor, sEffect, rTarget, aIgnore)
 			-- Iterate through each effect component looking for a type match
 			for _,sEffectComp in ipairs(aEffectComps) do
 				local rEffectComp = EffectManager5E.parseEffectComp(sEffectComp);
-				
+
 				-- CHECK CONDITIONALS
 				if rEffectComp.type == "IF" then
 					if not EffectManager5E.checkConditional(rActor, v, rEffectComp.remainder, nil, aIgnore) then
@@ -789,7 +797,7 @@ function checkConditionalHelper(rActor, sEffect, rTarget, aIgnore)
 					if not EffectManager5E.checkConditional(rTarget, v, rEffectComp.remainder, rActor, aIgnore) then
 						break;
 					end
-				
+
 				-- CHECK FOR AN ACTUAL EFFECT MATCH
 				elseif rEffectComp.original:lower() == sEffect then
 					if EffectManager.isTargetedEffect(v) then
@@ -803,7 +811,7 @@ function checkConditionalHelper(rActor, sEffect, rTarget, aIgnore)
 			end
 		end
 	end
-	
+
 	return false;
 end
 
@@ -844,10 +852,10 @@ function manager_power_performAction(draginfo, rActor, rAction, nodePower)
 	if not rActor or not rAction then
 		return false;
 	end
-	
-    -- add itemPath to rActor so that when effects are checked we can 
+
+    -- add itemPath to rActor so that when effects are checked we can
     -- make compare against action only effects
-    local nodeWeapon = nodePower.getChild("...");
+    local nodeWeapon = DB.getChild(nodePower, "...");
     local _, sRecord = DB.getValue(nodeWeapon, "shortcut", "", "");
 	rActor.itemPath = sRecord;
 
@@ -855,13 +863,13 @@ function manager_power_performAction(draginfo, rActor, rAction, nodePower)
 	if AmmunitionManager then
 		local nodeAmmo = AmmunitionManager.getAmmoNode(nodeWeapon, rActor)
 		if nodeAmmo then
-			rActor.ammoPath = nodeAmmo.getPath()
+			rActor.ammoPath = DB.getPath(nodeAmmo)
 		end
 		if (draginfo and rActor.ammoPath and rActor.ammoPath ~= "") then
 			draginfo.setMetaData("ammoPath", rActor.ammoPath);
 		end
 	end
- 
+
     if (draginfo and rActor.itemPath and rActor.itemPath ~= "") then
         draginfo.setMetaData("itemPath",rActor.itemPath);
     end
@@ -881,26 +889,26 @@ function manager_power_performAction(draginfo, rActor, rAction, nodePower)
 		if ((rAction.subtype == "") or (rAction.subtype == "save")) and ((rAction.save or "") ~= "") then
 			table.insert(rRolls, ActionPower.getSaveVsRoll(rActor, rAction));
 		end
-	
+
 	elseif rAction.type == "attack" then
 		table.insert(rRolls, ActionAttack.getRoll(rActor, rAction));
-		
+
 	elseif rAction.type == "powersave" then
 		table.insert(rRolls, ActionPower.getSaveVsRoll(rActor, rAction));
 
 	elseif rAction.type == "damage" then
 		table.insert(rRolls, ActionDamage.getRoll(rActor, rAction));
-		
+
 	elseif rAction.type == "heal" then
 		table.insert(rRolls, ActionHeal.getRoll(rActor, rAction));
-		
+
 	elseif rAction.type == "effect" then
 		local rRoll = ActionEffect.getRoll(draginfo, rActor, rAction);
 		if rRoll then
 			table.insert(rRolls, rRoll);
 		end
 	end
-	
+
 	if #rRolls > 0 then
 		ActionsManager.performMultiAction(draginfo, rActor, rRolls[1].sType, rRolls);
 	end
@@ -918,7 +926,7 @@ end
 function addClassFeature(nodeChar, sClass, sRecord, nodeClass, bWizard)
 	addClassFeature_old(nodeChar, sClass, sRecord, nodeClass, bWizard);
 	if rAdd then
-		addAbilityEffects(nodeChar, sRecord);
+		addAbilityEffects(nodeChar);
 	end
 end
 
@@ -926,7 +934,7 @@ end
 function addFeat(nodeChar, sClass, sRecord, bWizard)
 	addFeat_old(nodeChar, sClass, sRecord, bWizard);
 	if rAdd then
-		addAbilityEffects(nodeChar, sRecord);
+		addAbilityEffects(nodeChar);
 	end
 end
 
@@ -934,7 +942,7 @@ end
 function addRaceTrait(nodeChar, sClass, sRecord, bWizard)
 	addRaceTrait_old(nodeChar, sClass, sRecord, bWizard);
 	if rAdd then
-		addAbilityEffects(nodeChar, sRecord);
+		addAbilityEffects(nodeChar);
 	end
 end
 
@@ -951,7 +959,7 @@ function addAbilityEffects(nodeChar)
 	end
 
 	local nodeEntry = ActorManager.getCTNode(nodeChar);
-	for _,nodeSourceEffect in pairs(DB.getChildren(nodeSource, "effectlist")) do
+	for _,nodeSourceEffect in ipairs(DB.getChildList(nodeSource, "effectlist")) do
 		local nodeCharEffect = nodeList.createChild();
 		DB.copyNode(nodeSourceEffect, nodeCharEffect);
 		if nodeEntry then
