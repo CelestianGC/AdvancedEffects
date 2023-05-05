@@ -15,7 +15,9 @@
 			</anchored>
 			<allowdelete />
 			<child></child>
-			<child><backcolor>1A40301E</backcolor></child>
+			<child>
+				<backcolor>1A40301E</backcolor>
+			</child>
 			<noscroll />
 			<script>
 				function onInit()
@@ -49,9 +51,9 @@
 	<template name="cycler_abilitytypes">
 		<button_stringcycler>
 			<parameters>
-                <defaultlabelres mergerule="replace">modifier</defaultlabelres>
+				<defaultlabelres mergerule="replace">modifier</defaultlabelres>
 				<labelsres>modifier</labelsres>
-                <values>modifier</values>
+				<values>modifier</values>
 			</parameters>
 		</button_stringcycler>
 	</template>
@@ -70,68 +72,68 @@
 			<parameters>
 				<defaultlabelres mergerule="replace">dash</defaultlabelres>
 				<labelsres>save|ability|susceptiblity|misc_ae</labelsres>
-                <values>save|ability|susceptiblity|misc_ae</values>
+				<values>save|ability|susceptiblity|misc_ae</values>
 			</parameters>
 		</button_stringcycler>
 	</template>
 	<template name="cycler_savetypes">
 		<button_stringcycler>
 			<parameters>
-                <defaultlabelres mergerule="replace">modifier</defaultlabelres>
+				<defaultlabelres mergerule="replace">modifier</defaultlabelres>
 				<labelsres>modifier</labelsres>
-                <values>modifier</values>
+				<values>modifier</values>
 			</parameters>
 		</button_stringcycler>
 	</template>
 	<template name="combobox_saveselect">
-			<combobox>
-				<listdirection>down</listdirection>
-				<script>
+		<combobox>
+			<listdirection>down</listdirection>
+			<script>
 					function onInit()
 						super.onInit();
 						addItems({"STR","DEX","CON","INT","WIS","CHA"});
 					end
-				</script>
-				<!-- <script file="campaign/scripts/prof_select.lua"/> bonuscomps -->
-			</combobox>
+			</script>
+			<!-- <script file="campaign/scripts/prof_select.lua"/> bonuscomps -->
+		</combobox>
 	</template>
 	<template name="cycler_susceptiblitytypes">
 		<button_stringcycler>
 			<parameters>
 				<defaultlabelres mergerule="replace">immune</defaultlabelres>
 				<labelsres>resist|vuln</labelsres>
-                <values>resist|vuln</values>
+				<values>resist|vuln</values>
 			</parameters>
 		</button_stringcycler>
 	</template>
 	<template name="combobox_susceptiblity_items">
-			<combobox>
-				<listdirection>down</listdirection>
-				<script>
+		<combobox>
+			<listdirection>down</listdirection>
+			<script>
 					function onInit()
 						super.onInit();
 						addItems(DataCommon.dmgtypes);
 						addItems(DataCommon.conditions);
 					end
-				</script>
-				<!-- <script file="campaign/scripts/prof_select.lua"/> -->
-			</combobox>
+			</script>
+			<!-- <script file="campaign/scripts/prof_select.lua"/> -->
+		</combobox>
 	</template>
 	<template name="cycler_misctypes">
 		<button_stringcycler>
 			<parameters>
 				<defaultlabelres mergerule="replace">ac</defaultlabelres>
-				<labelsres>atk|check|dmg|heal|init_ae|save</labelsres>
-                <values>atk|check|dmg|heal|init_ae|save</values>
+				<labelsres>atk|check|dmg|heal|init|save</labelsres>
+				<values>atk|check|dmg|heal|init|save</values>
 			</parameters>
 		</button_stringcycler>
 	</template>
-    <template name="advanced_effect_number">
-        <basicnumber>
-            <default>0</default>
-            <hideonvalue>0</hideonvalue>
-            <gmeditonly />
-        </basicnumber>
-    </template>
+	<template name="advanced_effect_number">
+		<basicnumber>
+			<default>0</default>
+			<hideonvalue>0</hideonvalue>
+			<gmeditonly />
+		</basicnumber>
+	</template>
 
 </root>
