@@ -136,4 +136,12 @@
 		</basicnumber>
 	</template>
 
+	<!-- Override CoreRPG subwindow_record version here to add fastinit and activate otherwise readonly records do not show data -->
+	<template name="subwindow_record">
+		<subwindow>
+			<anchored to="contentframe" position="over" />
+			<fastinit />
+			<activate />
+		</subwindow>
+	</template>
 </root>

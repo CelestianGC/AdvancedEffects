@@ -5,7 +5,7 @@
 -->
 
 <root>
-<!-- 	<template name="list_charinv" merge="replace">
+	<!-- 	<template name="list_charinv" merge="replace">
 		<windowlist>
 			<child></child>
 			<child><backcolor>1A40301E</backcolor></child>
@@ -18,30 +18,30 @@
 
 	<windowclass name="char_weapon" merge="join">
 		<script file="campaign/scripts/char_weapon_adnd.lua" merge="replace" />
-  </windowclass>
+	</windowclass>
 
 	<windowclass name="item_main" merge="join">
-        <sheetdata>
-            <!-- effects -->
+		<sheetdata>
+			<!-- effects -->
 			<subwindow name="advanced_effects_contents" insertbefore="properties_label">
 				<anchored>
 					<top parent="columnanchor" anchor="bottom" relation="relative" offset="0" />
 					<left offset="5" />
-                    <right offset="5" />
+					<right offset="5" />
 				</anchored>
 				<class>advanced_effects_subwindow</class>
 				<activate />
 				<fastinit />
-                <invisible />
+				<invisible />
 			</subwindow>
-            <!-- end advanced effects entry -->
-        </sheetdata>
+			<!-- end advanced effects entry -->
+		</sheetdata>
 	</windowclass>
 
 	<windowclass name="ref_classfeature_stats" merge="join">
 		<sheetdata>
 			<!-- effects -->
-			<subwindow name="advanced_effects_contents" insertbefore="text">
+			<subwindow name="advanced_effects_contents" insertafter="text">
 				<anchored>
 					<top parent="columnanchor" anchor="bottom" relation="relative" offset="0" />
 					<left offset="5" />
@@ -59,7 +59,7 @@
 	<windowclass name="ref_classfeature_stats_specialization" merge="join">
 		<sheetdata>
 			<!-- effects -->
-			<subwindow name="advanced_effects_contents" insertbefore="text">
+			<subwindow name="advanced_effects_contents" insertafter="text">
 				<anchored>
 					<top parent="columnanchor" anchor="bottom" relation="relative" offset="0" />
 					<left offset="5" />
@@ -88,10 +88,10 @@
 			end
 		</script>
 		<sheetdata>
-			<subwindow name="advanced_effects_contents" insertbefore="text">
+			<subwindow name="advanced_effects_contents" insertafter="text">
 				<anchored to="contentframe" height="60">
 					<left />
-					<top />
+					<bottom />
 					<right />
 				</anchored>
 				<class>advanced_effects_subwindow</class>
@@ -134,10 +134,10 @@
 			end
 		</script>
 		<sheetdata>
-			<subwindow name="advanced_effects_contents" insertbefore="text">
+			<subwindow name="advanced_effects_contents" insertafter="text">
 				<anchored to="contentframe" height="60">
 					<left />
-					<top />
+					<bottom />
 					<right />
 				</anchored>
 				<class>advanced_effects_subwindow</class>
@@ -162,10 +162,10 @@
 			end
 		</script>
 		<sheetdata>
-			<subwindow name="advanced_effects_contents" insertbefore="text">
+			<subwindow name="advanced_effects_contents" insertafter="text">
 				<anchored to="contentframe" height="60">
 					<left />
-					<top />
+					<bottom />
 					<right />
 				</anchored>
 				<class>advanced_effects_subwindow</class>
@@ -180,10 +180,10 @@
 		</sheetdata>
 	</windowclass>
 
-    <!-- advanced effects subwindow -->
-    <windowclass name="advanced_effects_subwindow">
+	<!-- advanced effects subwindow -->
+	<windowclass name="advanced_effects_subwindow">
 		<margins control="0,0,2,2" />
-        <script>
+		<script>
             function onInit()
                 local node = getDatabaseNode();
                 local bIDentified = (DB.getValue(node, "isidentified", 0) > 0);
@@ -208,17 +208,17 @@
                     effects_list.setVisible(false);
                 end
             end
-        </script>
+		</script>
 		<sheetdata>
 			<anchor_column name="columnanchor" />
-            <!-- effects -->
+			<!-- effects -->
 			<header_column name="header_effects">
 				<static textres="header_effects" />
 				<center />
 			</header_column>
 			<button_iedit name="effects_iedit">
 				<anchored to="header_effects" position="insidetopright" offset="-5,0" />
- 				<script>
+				<script>
 					function onValueChanged()
 						local bEditMode = (getValue() == 1);
 						
@@ -244,31 +244,31 @@
 					end
 				</script>
 			</list_editor_advanced_effects>
-            <!-- end advanced effects entry -->
+			<!-- end advanced effects entry -->
 		</sheetdata>
-    </windowclass>
+	</windowclass>
 
 	<windowclass name="npc_combat" merge="join">
 		<sheetdata>
-            <!-- effects -->
+			<!-- effects -->
 			<subwindow name="advanced_effects_contents" insertbefore="header_traits">
 				<anchored>
 					<top parent="columnanchor" anchor="bottom" relation="relative" offset="0" />
 					<left offset="5" />
-                    <right offset="5" />
+					<right offset="5" />
 				</anchored>
 				<class>advanced_effects_subwindow</class>
 				<activate />
 				<fastinit />
-                <invisible />
+				<invisible />
 			</subwindow>
-            <!-- end effects -->
+			<!-- end effects -->
 		</sheetdata>
 	</windowclass>
 
 	<windowclass name="charsheet_abilities_contents" merge="join" insertafter="languagestitle">
 		<sheetdata>
-            <!-- effects -->
+			<!-- effects -->
 			<label_charframetop name="advancedeffectstitle">
 				<anchored to="languagestitle" height="20">
 					<top anchor="bottom" relation="relative" offset="7" />
@@ -283,7 +283,7 @@
 
 			<button_iedit name="effects_iedit">
 				<anchored to="advancedeffectstitle" position="insidetopright" offset="-5,0" />
- 				<script>
+				<script>
 					function onValueChanged()
 						local bEditMode = (getValue() == 1);
 
@@ -298,11 +298,11 @@
 			</button_iadd>
 
 			<list_editor_advanced_effects name="effects_list">
-                <anchored>
-                    <top parent="advancedeffectstitle" anchor="bottom" relation="relative" offset="0" />
-                    <left />
-                    <right />
-                </anchored>
+				<anchored>
+					<top parent="advancedeffectstitle" anchor="bottom" relation="relative" offset="0" />
+					<left />
+					<right />
+				</anchored>
 				<datasource>.effectlist</datasource>
 				<class>advanced_effects_entry</class>
 				<script>
@@ -314,7 +314,7 @@
 					end
 				</script>
 			</list_editor_advanced_effects>
-            <!-- end advanced effects entry -->
+			<!-- end advanced effects entry -->
 		</sheetdata>
 	</windowclass>
 
