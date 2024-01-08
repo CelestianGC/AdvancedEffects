@@ -52,13 +52,13 @@ function onAttackAction(draginfo)
 		local bIsLoaded = DB.getValue(nodeAmmoManager, "isloaded") == 1;
 		if not bLoading or bIsLoaded then
 			if bInfiniteAmmo or nAmmo > 0 then
+				if bLoading then DB.setValue(nodeAmmoManager, "isloaded", "number", 0); end
 				ActionAttack.performRoll(draginfo, rActor, rAction);
 				return true;
 			end
 			messagedata.text = Interface.getString("char_message_atkwithnoammo");
 			Comm.deliverChatMessage(messagedata);
-
-			if bLoading then DB.setValue(nodeWeapon, "isloaded", "number", 0); end
+			if bLoading then DB.setValue(nodeAmmoManager, "isloaded", "number", 0); end
 		else
 			local sWeaponName = DB.getValue(nodeWeapon, "name", "weapon");
 			messagedata.text = string.format(Interface.getString("char_actions_notloaded"), sWeaponName, true, rActor);
