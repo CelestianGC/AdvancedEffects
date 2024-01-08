@@ -45,23 +45,23 @@ function onAttackAction(draginfo)
 		return true;
 	else
 		local nAmmo, bInfiniteAmmo = AmmunitionManager.getAmmoRemaining(rActor, nodeWeapon, AmmunitionManager.getAmmoNode(nodeWeapon));
-		local messagedata = { text = '', sender = rActor.sName, font = "emotefont" };
+		local messagedata = { text = "", sender = rActor.sName, font = "emotefont" };
 
+		local nodeAmmoManager = DB.getChild(nodeWeapon, "ammunitionmanager");
 		local bLoading = AmmunitionManager.hasLoadAction(nodeWeapon);
-		local bIsLoaded = DB.getValue(nodeWeapon, 'isloaded', 0) == 1;
-		if not bLoading or (bLoading and bIsLoaded) then
-			if bLoading then DB.setValue(nodeWeapon, 'isloaded', 'number', 0); end
-
-			if (bInfiniteAmmo or nAmmo > 0) then
+		local bIsLoaded = DB.getValue(nodeAmmoManager, "isloaded") == 1;
+		if not bLoading or bIsLoaded then
+			if bInfiniteAmmo or nAmmo > 0 then
 				ActionAttack.performRoll(draginfo, rActor, rAction);
 				return true;
-			else
-				messagedata.text = Interface.getString('char_message_atkwithnoammo');
-				Comm.deliverChatMessage(messagedata);
 			end
+			messagedata.text = Interface.getString("char_message_atkwithnoammo");
+			Comm.deliverChatMessage(messagedata);
+
+			if bLoading then DB.setValue(nodeWeapon, "isloaded", "number", 0); end
 		else
-			local sWeaponName = DB.getValue(nodeWeapon, 'name', 'weapon');
-			messagedata.text = string.format(Interface.getString('char_actions_notloaded'), sWeaponName, true, rActor);
+			local sWeaponName = DB.getValue(nodeWeapon, "name", "weapon");
+			messagedata.text = string.format(Interface.getString("char_actions_notloaded"), sWeaponName, true, rActor);
 			Comm.deliverChatMessage(messagedata);
 		end
 	end
