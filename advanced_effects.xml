@@ -5,7 +5,7 @@
 -->
 
 <root>
-	<!-- 	<template name="list_charinv" merge="replace">
+    <!-- 	<template name="list_charinv" merge="replace">
 		<windowlist>
 			<child></child>
 			<child><backcolor>1A40301E</backcolor></child>
@@ -16,306 +16,155 @@
 		</windowlist>
 	</template> -->
 
-	<windowclass name="char_weapon" merge="join">
-		<script file="campaign/scripts/char_weapon_adnd.lua" merge="replace" />
-	</windowclass>
+    <windowclass name="char_weapon" merge="join">
+        <script file="campaign/scripts/char_weapon_adnd.lua" merge="replace" />
+    </windowclass>
 
-	<windowclass name="item_main" merge="join">
-		<sheetdata>
-			<!-- effects -->
-			<subwindow name="advanced_effects_contents" insertbefore="properties_label">
-				<anchored>
-					<top parent="columnanchor" anchor="bottom" relation="relative" offset="0" />
-					<left offset="5" />
-					<right offset="5" />
-				</anchored>
-				<class>advanced_effects_subwindow</class>
-				<activate />
-				<fastinit />
-				<invisible />
-			</subwindow>
-			<!-- end advanced effects entry -->
-		</sheetdata>
-	</windowclass>
-
-	<windowclass name="ref_classfeature_stats" merge="join">
-		<sheetdata>
-			<!-- effects -->
-			<subwindow name="advanced_effects_contents" insertafter="text">
-				<anchored>
-					<top parent="columnanchor" anchor="bottom" relation="relative" offset="0" />
-					<left offset="5" />
-					<right offset="5" />
-				</anchored>
-				<class>advanced_effects_subwindow</class>
-				<activate />
-				<fastinit />
-				<invisible />
-			</subwindow>
-			<!-- end advanced effects entry -->
-		</sheetdata>
-	</windowclass>
-
-	<windowclass name="ref_classfeature_stats_specialization" merge="join">
-		<sheetdata>
-			<!-- effects -->
-			<subwindow name="advanced_effects_contents" insertafter="text">
-				<anchored>
-					<top parent="columnanchor" anchor="bottom" relation="relative" offset="0" />
-					<left offset="5" />
-					<right offset="5" />
-				</anchored>
-				<class>advanced_effects_subwindow</class>
-				<activate />
-				<fastinit />
-				<invisible />
-			</subwindow>
-			<!-- end advanced effects entry -->
-		</sheetdata>
-	</windowclass>
-
-	<windowclass name="reference_feat" merge="join">
-		<script>
-			function onInit()
-				if super and super.onInit then
-					super.onInit()
-				end
-				if text then
-					text.setAnchor("top", "contentframe", "top", "absolute", 65);
-				else
-					advanced_effects_contents.setVisible(false);
-				end
-			end
-		</script>
-		<sheetdata>
-			<subwindow name="advanced_effects_contents" insertafter="text">
-				<anchored to="contentframe" height="60">
-					<left />
-					<bottom />
-					<right />
-				</anchored>
-				<class>advanced_effects_subwindow</class>
-				<activate />
-				<fastinit />
-				<invisible />
-			</subwindow>
-			<scrollbar>
-				<anchored to="advanced_effects_contents" />
-				<target>advanced_effects_contents</target>
-			</scrollbar>
-		</sheetdata>
-	</windowclass>
-
-	<windowclass name="feat_main" merge="join">
-		<sheetdata>
-			<!-- effects -->
-			<subwindow name="advanced_effects_contents" insertbefore="type_label">
-				<anchored>
-					<top parent="columnanchor" anchor="bottom" relation="relative" offset="0" />
-					<left offset="5" />
-					<right offset="5" />
-				</anchored>
-				<class>advanced_effects_subwindow</class>
-				<activate />
-				<fastinit />
-				<invisible />
-			</subwindow>
-			<!-- end advanced effects entry -->
-		</sheetdata>
-	</windowclass>
-
-	<windowclass name="reference_racialtrait" merge="join">
-		<script>
-			function onInit()
-				if super and super.onInit then
-					super.onInit()
-				end
-				text.setAnchor("top", "contentframe", "top", "absolute", 65);
-			end
-		</script>
-		<sheetdata>
-			<subwindow name="advanced_effects_contents" insertafter="text">
-				<anchored to="contentframe" height="60">
-					<left />
-					<bottom />
-					<right />
-				</anchored>
-				<class>advanced_effects_subwindow</class>
-				<activate />
-				<fastinit />
-				<invisible />
-			</subwindow>
-			<scrollbar>
-				<anchored to="advanced_effects_contents" />
-				<target>advanced_effects_contents</target>
-			</scrollbar>
-		</sheetdata>
-	</windowclass>
-
-	<windowclass name="reference_subracialtrait" merge="join">
-		<script>
-			function onInit()
-				if super and super.onInit then
-					super.onInit()
-				end
-				text.setAnchor("top", "contentframe", "top", "absolute", 65);
-			end
-		</script>
-		<sheetdata>
-			<subwindow name="advanced_effects_contents" insertafter="text">
-				<anchored to="contentframe" height="60">
-					<left />
-					<bottom />
-					<right />
-				</anchored>
-				<class>advanced_effects_subwindow</class>
-				<activate />
-				<fastinit />
-				<invisible />
-			</subwindow>
-			<scrollbar>
-				<anchored to="advanced_effects_contents" />
-				<target>advanced_effects_contents</target>
-			</scrollbar>
-		</sheetdata>
-	</windowclass>
-
-	<!-- advanced effects subwindow -->
-	<windowclass name="advanced_effects_subwindow">
-		<margins control="0,0,2,2" />
-		<script>
-            function onInit()
-                local node = getDatabaseNode();
-                local bIDentified = (DB.getValue(node, "isidentified", 0) > 0);
-                local bPCEdit = OptionsManager.isOption("ADND_AE_EDIT", "enabled");
-                local bIsPcItem = string.match(DB.getPath(node),"^charsheet") ~= null;
-                local bCanEdit = false;
-
-                if (bIsPcItem and bIDentified and bPCEdit) or
-                    (bIsPcItem and bPCEdit) then
-                    bCanEdit = true;
-                end
-
-                if (Session.IsHost or bCanEdit) then
-                    header_effects.setVisible(true);
-                    effects_iedit.setVisible(true);
-                    effects_list_iadd.setVisible(true);
-                    effects_list.setVisible(true);
-                else
-                    header_effects.setVisible(false);
-                    effects_iedit.setVisible(false);
-                    effects_list_iadd.setVisible(false);
-                    effects_list.setVisible(false);
-                end
-            end
-		</script>
-		<sheetdata>
-			<anchor_column name="columnanchor" />
-			<!-- effects -->
-			<header_column name="header_effects">
-				<static textres="header_effects" />
-				<center />
-			</header_column>
-			<button_iedit name="effects_iedit">
-				<anchored to="header_effects" position="insidetopright" offset="-5,0" />
-				<script>
-					function onValueChanged()
-						local bEditMode = (getValue() == 1);
-						
-						window.effects_list_iadd.setVisible(bEditMode);
-						window.effects_list.update();
-					end
-				</script>
-			</button_iedit>
-			<button_iadd name="effects_list_iadd">
-				<anchored to="effects_iedit" position="lefthigh" offset="5,0" />
-				<target>effects_list</target>
-			</button_iadd>
-
-			<list_editor_advanced_effects name="effects_list">
-				<datasource>.effectlist</datasource>
-				<class>advanced_effects_entry</class>
-				<script>
-					function addEntry(bFocus)
-						local n = getWindowCount();
-
-						local w = createWindow();
-						return w;
-					end
-				</script>
-			</list_editor_advanced_effects>
-			<!-- end advanced effects entry -->
-		</sheetdata>
-	</windowclass>
-
-	<windowclass name="npc_combat" merge="join">
-		<sheetdata>
-			<!-- effects -->
-			<subwindow name="advanced_effects_contents" insertbefore="header_traits">
-				<anchored>
-					<top parent="columnanchor" anchor="bottom" relation="relative" offset="0" />
-					<left offset="5" />
-					<right offset="5" />
-				</anchored>
-				<class>advanced_effects_subwindow</class>
-				<activate />
-				<fastinit />
-				<invisible />
-			</subwindow>
-			<!-- end effects -->
-		</sheetdata>
-	</windowclass>
-
-	<windowclass name="charsheet_abilities_contents" merge="join" insertafter="languagestitle">
-		<sheetdata>
-			<!-- effects -->
-			<label_charframetop name="advancedeffectstitle">
-				<anchored to="languagestitle" height="20">
-					<top anchor="bottom" relation="relative" offset="7" />
-					<left />
-					<right />
-				</anchored>
-				<static textres="char_abilities_label_advancedeffects" />
-				<icons>char_abilities</icons>
-				<target>header_effects</target>
-			</label_charframetop>
+    <windowclass name="item_main" merge="join">
+        <sheetdata>
+            <!-- effects -->
+            <subwindow name="advanced_effects_contents" insertbefore="properties_label">
+                <anchored>
+                    <top parent="columnanchor" anchor="bottom" relation="relative" offset="0" />
+                    <left offset="5" />
+                    <right offset="5" />
+                </anchored>
+                <class>advanced_effects_subwindow</class>
+                <activate />
+                <fastinit />
+                <invisible />
+            </subwindow>
+            <!-- end advanced effects entry -->
+        </sheetdata>
+    </windowclass>
 
 
-			<button_iedit name="effects_iedit">
-				<anchored to="advancedeffectstitle" position="insidetopright" offset="-5,0" />
-				<script>
+    <windowclass name="reference_race_main" merge="join">
+        <sheetdata>
+            <subwindow name="advanced_effects_contents" insertafter="traits">
+                <anchored>
+                    <top parent="traits" anchor="bottom" relation="relative" offset="0" />
+                    <left offset="5" />
+                    <right offset="5" />
+                </anchored>
+                <class>advanced_effects_subwindow</class>
+                <activate />
+                <fastinit />
+            </subwindow>
+        </sheetdata>
+    </windowclass>
+
+    <windowclass name="reference_subrace_main" merge="join">
+        <sheetdata>
+            <subwindow name="advanced_effects_contents" insertafter="traits">
+                <anchored>
+                    <top parent="traits" anchor="bottom" relation="relative" offset="0" />
+                    <left offset="5" />
+                    <right offset="5" />
+                </anchored>
+                <class>advanced_effects_subwindow</class>
+                <activate />
+                <fastinit />
+            </subwindow>
+
+        </sheetdata>
+    </windowclass>
+
+    <windowclass name="advanced_effects_subwindow">
+        <sheetdata>
+            <anchor_column name="columnanchor" />
+            <!-- advanced effects -->
+            <!-- effects  -->
+            <header_column name="advancedeffects_header">
+                <static textres="char_abilities_label_advancedeffects"/>
+                <center />
+            </header_column>
+            <button_iedit name="effectslist_iedit">
+                <anchored to="advancedeffects_header" position="righthigh" offset="-20,0" />
+                <target>effectslist</target>
+            </button_iedit>
+            <button_iadd name="effectslist_iadd">
+                <anchored to="effectslist_iedit" position="lefthigh" offset="5,0" />
+                <target>effectslist</target>
+            </button_iadd>
+
+            <list_column name="effectslist">
+                <datasource>.effectlist</datasource>
+                <class>advanced_effects_entry</class>
+            </list_column>
+            <!-- end advanced effects entry -->
+        </sheetdata>
+    </windowclass>
+
+
+    <windowclass name="npc_combat" merge="join">
+        <sheetdata>
+            <!-- effects -->
+            <subwindow name="advanced_effects_contents" insertbefore="header_traits">
+                <anchored>
+                    <top parent="columnanchor" anchor="bottom" relation="relative" offset="0" />
+                    <left offset="5" />
+                    <right offset="5" />
+                </anchored>
+                <class>advanced_effects_subwindow</class>
+                <activate />
+                <fastinit />
+                <!-- <invisible /> -->
+            </subwindow>
+            <!-- end effects -->
+        </sheetdata>
+    </windowclass>
+
+    <windowclass name="charsheet_abilities_contents" merge="join" insertafter="languagestitle">
+        <sheetdata>
+            <!-- effects -->
+            <label_charframetop name="advancedeffectstitle">
+                <anchored to="languagestitle" height="20">
+                    <top anchor="bottom" relation="relative" offset="7" />
+                    <left />
+                    <right />
+                </anchored>
+                <static textres="char_abilities_label_advancedeffects" />
+                <icons>char_abilities</icons>
+                <target>header_effects</target>
+            </label_charframetop>
+
+
+            <button_iedit name="effects_iedit">
+                <anchored to="advancedeffectstitle" position="insidetopright" offset="-5,0" />
+                <script>
 					function onValueChanged()
 						local bEditMode = (getValue() == 1);
 
 						window.effects_list_iadd.setVisible(bEditMode);
 						window.effects_list.update();
 					end
-				</script>
-			</button_iedit>
-			<button_iadd name="effects_list_iadd">
-				<anchored to="effects_iedit" position="lefthigh" offset="5,0" />
-				<target>effects_list</target>
-			</button_iadd>
+                </script>
+            </button_iedit>
+            <button_iadd name="effects_list_iadd">
+                <anchored to="effects_iedit" position="lefthigh" offset="5,0" />
+                <target>effects_list</target>
+            </button_iadd>
 
-			<list_editor_advanced_effects name="effects_list">
-				<anchored>
-					<top parent="advancedeffectstitle" anchor="bottom" relation="relative" offset="0" />
-					<left />
-					<right />
-				</anchored>
-				<datasource>.effectlist</datasource>
-				<class>advanced_effects_entry</class>
-				<script>
+            <list_editor_advanced_effects name="effects_list">
+                <anchored>
+                    <top parent="advancedeffectstitle" anchor="bottom" relation="relative" offset="0" />
+                    <left />
+                    <right />
+                </anchored>
+                <datasource>.effectlist</datasource>
+                <class>advanced_effects_entry</class>
+                <script>
 					function addEntry(bFocus)
 						local n = getWindowCount();
 
 						local w = createWindow();
 						return w;
 					end
-				</script>
-			</list_editor_advanced_effects>
-			<!-- end advanced effects entry -->
-		</sheetdata>
-	</windowclass>
+                </script>
+            </list_editor_advanced_effects>
+            <!-- end advanced effects entry -->
+        </sheetdata>
+    </windowclass>
 
 </root>
