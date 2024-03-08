@@ -5,19 +5,56 @@
 -->
 
 <root>
-    <!-- 	<template name="list_charinv" merge="replace">
-		<windowlist>
-			<child></child>
-			<child><backcolor>1A40301E</backcolor></child>
-			<datasource>.inventorylist</datasource>
-			<class>char_invitem</class>
-			<allowdelete />
-			<script file="campaign/scripts/char_invlist_adnd.lua" />
-		</windowlist>
-	</template> -->
-
     <windowclass name="char_weapon" merge="join">
         <script file="campaign/scripts/char_weapon_adnd.lua" merge="replace" />
+    </windowclass>
+
+    <!-- Have to override this so we can offset the content and slide things down. They default "nail" this to specific spot otherwise -->
+    <template name="sub_content_framed_groupbox_base">
+        <subwindow>
+            <anchored to="contentanchor">
+                <left offset="15" />
+                <right offset="-15" />
+                <top relation="relative" offset="15" />
+            </anchored>
+            <frame name="groupbox" offset="15,15,15,15" />
+            <activate />
+            <fastinit />
+        </subwindow>
+    </template>
+
+    <windowclass name="ref_ability" merge="join">
+        <sheetdata>
+            <subwindow name="advanced_effects_contents" insertbefore="content">
+                <anchored to="contentanchor">
+                    <left offset="15" />
+                    <right offset="-15" />
+                    <top relation="relative" offset="15" />
+                </anchored>
+                <class>advanced_effects_subwindow</class>
+                <activate />
+                <fastinit />
+                <invisible />
+            </subwindow>
+        </sheetdata>
+    </windowclass>
+
+
+    <windowclass name="reference_feat" merge="join">
+        <sheetdata>
+            <subwindow name="advanced_effects_contents" insertbefore="content">
+                <anchored to="contentanchor">
+                    <left offset="15" />
+                    <right offset="-15" />
+                    <top relation="relative" offset="15" />
+                </anchored>
+                <class>advanced_effects_subwindow</class>
+                <activate />
+                <fastinit />
+                <invisible />
+            </subwindow>
+            <!-- end advanced effects entry -->
+        </sheetdata>
     </windowclass>
 
     <windowclass name="item_main" merge="join">
