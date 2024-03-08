@@ -10,7 +10,7 @@
     </windowclass>
 
     <!-- Have to override this so we can offset the content and slide things down. They default "nail" this to specific spot otherwise -->
-    <template name="sub_content_framed_groupbox_base">
+    <!-- <template name="sub_content_framed_groupbox_base">
         <subwindow>
             <anchored to="contentanchor">
                 <left offset="15" />
@@ -53,9 +53,8 @@
                 <fastinit />
                 <invisible />
             </subwindow>
-            <!-- end advanced effects entry -->
         </sheetdata>
-    </windowclass>
+    </windowclass> -->
 
     <windowclass name="item_main" merge="join">
         <sheetdata>
